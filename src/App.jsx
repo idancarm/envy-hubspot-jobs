@@ -1,0 +1,544 @@
+import React, { useState, useEffect, useMemo } from 'react';
+import { IconGrid, IconCalculator, IconSettings, IconDrag } from './components/Icons';
+import CatalogView from './components/CatalogView';
+import JobDetailPage from './components/JobDetailPage';
+import AdminPanel from './components/AdminPanel';
+import ServiceCard from './components/ServiceCard';
+import BundleCard from './components/BundleCard';
+import CartItem from './components/CartItem';
+
+// Logo URLs
+const ENVY_LOGO_URL = "https://goenvy.io/wp-content/uploads/2022/10/ENVY-Logo.svg";
+const HUBSPOT_BADGE_URL = "https://l.goenvy.io/hubfs/elite.svg";
+
+// --- Data ---
+const DEFAULT_SERVICES = [
+  {
+    id: 1,
+    name: 'Automate Warm Outreach',
+    description: 'Set up tracking for high-intent activities and configure Target Account settings so Sales can stop guessing.',
+    price: 1200,
+    details: 'Our custom n8n agent monitors prospect behavior across your website, email campaigns, and CRM. When high-intent signals are detected, it automatically triggers personalized outreach sequences. This includes configuring Target Account settings, lead scoring automation, and Sales notification workflows.',
+    deliverables: ['Custom n8n workflow setup', 'Target Account configuration', 'Lead scoring rules', 'Sales notification system'],
+    timeline: '5 business days'
+  },
+  {
+    id: 2,
+    name: 'Configure Your ICP',
+    description: 'Codify your Ideal Customer Profiles (ICP) into properties and scoring rules. Yes, for real.',
+    price: 1100,
+    details: 'We translate your ICP from slide decks into actionable HubSpot properties and automated scoring. This ensures your entire team works from the same definition of your ideal customer, with automatic lead qualification based on firmographic and behavioral data.',
+    deliverables: ['Custom ICP properties', 'Automated scoring system', 'Segmentation lists', 'Documentation'],
+    timeline: '5 business days'
+  },
+  {
+    id: 3,
+    name: 'Smart CRM Updates',
+    description: 'Let your CRM update itself using HubSpot\'s new smart properties and automated data enrichment tools.',
+    price: 850,
+    details: 'Leverage HubSpot\'s AI-powered smart properties and data enrichment to keep your CRM fresh without manual work. We configure automated data updates, company enrichment, and intelligent field population based on prospect interactions.',
+    deliverables: ['Smart property configuration', 'Data enrichment setup', 'Automated workflows', 'Quality checks'],
+    timeline: '3 business days'
+  },
+  {
+    id: 4,
+    name: 'Configure Buyer Intent',
+    description: 'Set up tracking for high-intent activities and configure Target Account settings for precision targeting.',
+    price: 1200,
+    details: 'Implement comprehensive buyer intent tracking across all touchpoints. We configure event tracking, engagement scoring, and Target Account identification so your Sales team knows exactly when prospects are ready to buy.',
+    deliverables: ['Intent tracking setup', 'Engagement scoring', 'Target Account configuration', 'Sales dashboards'],
+    timeline: '5 business days'
+  },
+];
+
+const DEFAULT_BUNDLES = [
+  {
+    id: 1,
+    name: 'RevOps Starter Pack',
+    description: 'Essential setup for scaling revenue operations',
+    serviceIds: [2, 3], // ICP + Smart CRM
+    discount: 10, // percentage
+    price: 1755 // calculated: (1100 + 850) * 0.9
+  },
+  {
+    id: 2,
+    name: 'Sales Acceleration Bundle',
+    description: 'Complete sales enablement package',
+    serviceIds: [1, 4], // Warm Outreach + Buyer Intent
+    discount: 15,
+    price: 2040 // calculated: (1200 + 1200) * 0.85
+  }
+];
+
+function App() {
+  // State
+  const [services, setServices] = useState(() => {
+    const saved = localStorage.getItem('envy_services');
+    return saved ? JSON.parse(saved) : DEFAULT_SERVICES;
+  });
+  const [bundles, setBundles] = useState(() => {
+    const saved = localStorage.getItem('envy_bundles');
+    return saved ? JSON.parse(saved) : DEFAULT_BUNDLES;
+  });
+  const [cartItems, setCartItems] = useState([]);
+  const [isDraggingOver, setIsDraggingOver] = useState(false);
+  const [currentView, setCurrentView] = useState('catalog'); // 'checkout', 'catalog', 'admin', 'detail'
+  const [selectedJob, setSelectedJob] = useState(null); // For detail view
+  const [checkoutTab, setCheckoutTab] = useState('jobs'); // 'jobs', 'bundles'
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(() => {
+    return localStorage.getItem('envy_admin_auth') === 'true';
+  });
+  const [uiSettings, setUiSettings] = useState(() => {
+    const defaults = {
+      siteTitle: 'Build Your Growth Stack',
+      siteSubtitle: 'Select the HubSpot jobs you need. No retainers. Just results.',
+      logoUrl: ENVY_LOGO_URL,
+      badgeUrl: HUBSPOT_BADGE_URL,
+      introVideoId: '',
+      introText: 'We help businesses grow with expert HubSpot services. No long-term commitments, just results.',
+      checkoutButtonText: 'Request Consultation',
+      catalogTitle: 'Job Catalog',
+      catalogSubtitle: 'Browse all available HubSpot jobs and their details'
+    };
+    const saved = localStorage.getItem('envy_ui_settings');
+    return saved ? { ...defaults, ...JSON.parse(saved) } : defaults;
+  });
+
+  // Persistence
+  useEffect(() => {
+    localStorage.setItem('envy_services', JSON.stringify(services));
+  }, [services]);
+
+  useEffect(() => {
+    localStorage.setItem('envy_bundles', JSON.stringify(bundles));
+  }, [bundles]);
+
+  useEffect(() => {
+    localStorage.setItem('envy_admin_auth', isAdminAuthenticated ? 'true' : 'false');
+  }, [isAdminAuthenticated]);
+
+  useEffect(() => {
+    localStorage.setItem('envy_ui_settings', JSON.stringify(uiSettings));
+  }, [uiSettings]);
+
+  // Admin Login
+  const handleAdminLogin = () => {
+    const password = prompt('Enter admin password:');
+    if (password === 'envy2024') { // Simple password check
+      setIsAdminAuthenticated(true);
+      setCurrentView('admin');
+    } else if (password !== null) {
+      alert('Incorrect password');
+    }
+  };
+
+  const handleAdminLogout = () => {
+    setIsAdminAuthenticated(false);
+    setCurrentView('catalog');
+  };
+
+  // Admin Handlers
+  const handleAddService = (newService) => {
+    const id = Math.max(...services.map(s => s.id), 0) + 1;
+    setServices([...services, { ...newService, id }]);
+  };
+
+  const handleEditService = (id, updatedService) => {
+    setServices(services.map(s => s.id === id ? { ...updatedService, id } : s));
+  };
+
+  const handleDeleteService = (id) => {
+    setServices(services.filter(s => s.id !== id));
+    // Also remove from cart if present
+    setCartItems(cartItems.filter(item => item.id !== id));
+  };
+
+  // Bundle Handlers
+  const handleAddBundle = (newBundle) => {
+    const id = Math.max(...bundles.map(b => b.id), 0) + 1;
+    setBundles([...bundles, { ...newBundle, id }]);
+  };
+
+  const handleEditBundle = (id, updatedBundle) => {
+    setBundles(bundles.map(b => b.id === id ? { ...updatedBundle, id } : b));
+  };
+
+  const handleDeleteBundle = (id) => {
+    setBundles(bundles.filter(b => b.id !== id));
+  };
+
+  // Drag & Drop Handlers
+  const handleDragStart = (e, item, isBundle = false) => {
+    if (isBundle) {
+      e.dataTransfer.setData("bundleId", item.id);
+    } else {
+      e.dataTransfer.setData("serviceId", item.id);
+    }
+    e.dataTransfer.effectAllowed = "copy";
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "copy";
+    setIsDraggingOver(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDraggingOver(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDraggingOver(false);
+
+    const serviceId = e.dataTransfer.getData("serviceId");
+    const bundleId = e.dataTransfer.getData("bundleId");
+
+    if (bundleId) {
+      const bundle = bundles.find(b => b.id === parseInt(bundleId, 10));
+      if (bundle) {
+        const newItem = { ...bundle, uniqueId: Date.now() + Math.random(), isBundle: true };
+        setCartItems(prev => [...prev, newItem]);
+      }
+    } else if (serviceId) {
+      const service = services.find(s => s.id === parseInt(serviceId, 10));
+      if (service) {
+        const newItem = { ...service, uniqueId: Date.now() + Math.random() };
+        setCartItems(prev => [...prev, newItem]);
+      }
+    }
+  };
+
+  const handleAddItemToCart = (item) => {
+    setCartItems(prev => [...prev, item]);
+    // Optional: Navigate to checkout or show success message
+    if (confirm(`Added ${item.name} to checkout. Go to checkout now?`)) {
+      setCurrentView('checkout');
+    }
+  };
+
+  const handleRemoveItem = (uniqueId) => {
+    setCartItems(prev => prev.filter(item => item.uniqueId !== uniqueId));
+  };
+
+  const totalCost = useMemo(() => {
+    return cartItems.reduce((sum, item) => sum + item.price, 0);
+  }, [cartItems]);
+
+  const handleCheckout = () => {
+    console.log("--- Checkout Initiated ---");
+    console.log("Selected Services:", cartItems);
+    console.log("Total Estimated Cost: $" + totalCost);
+    alert(`Checkout initiated!\n\nTotal: $${totalCost.toLocaleString()}\nCheck console for details.`);
+  };
+
+  const handleViewDetails = (job) => {
+    setSelectedJob(job);
+    setCurrentView('detail');
+  };
+
+  const handleBackToCatalog = () => {
+    setSelectedJob(null);
+    setCurrentView('catalog');
+  };
+
+  const handleAddToCartFromDetail = (job) => {
+    const newItem = { ...job, uniqueId: Date.now() + Math.random() };
+    handleAddItemToCart(newItem);
+  };
+
+  return (
+    <div className="container mx-auto px-4 py-8 lg:py-16 max-w-7xl min-h-screen flex flex-col">
+      {/* Logo Bar */}
+      <div className="bg-white rounded-2xl shadow-lg mb-8 px-8 py-4">
+        <div className="flex justify-between items-center">
+          <img src={uiSettings.logoUrl} alt="Logo" className="h-8 lg:h-10" />
+          <div className="flex items-center gap-4">
+            <img src={uiSettings.badgeUrl} alt="Badge" className="h-12 lg:h-16" />
+            {!isAdminAuthenticated ? (
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleAdminLogin();
+                }}
+                className="p-2 text-gray-400 hover:text-primary opacity-50 hover:opacity-100 transition-all duration-300"
+                title="Admin Login"
+              >
+                <IconSettings />
+              </button>
+            ) : (
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleAdminLogout();
+                }}
+                className="px-3 py-1.5 text-xs font-medium text-primary hover:text-secondary hover:bg-primary/10 rounded-lg transition-colors"
+                title="Logout"
+              >
+                Logout
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Header */}
+      <header className="mb-8">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl lg:text-6xl font-bold text-dark mb-2 tracking-tight font-heading">
+            {uiSettings.siteTitle}
+          </h1>
+          <p className="text-textMuted text-lg font-light">
+            {uiSettings.siteSubtitle}
+          </p>
+        </div>
+
+        {/* Intro Section - Video and Text */}
+        {currentView !== 'detail' && (
+          <div className="glass-panel rounded-2xl p-8 mb-8 max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+              {/* Left Column - Video or Placeholder */}
+              <div>
+                {uiSettings.introVideoId ? (
+                  <div className="rounded-xl overflow-hidden shadow-2xl border border-gray-300/50 relative pt-[56.25%] bg-black">
+                    <iframe
+                      className="absolute inset-0 w-full h-full"
+                      src={`https://www.youtube.com/embed/${uiSettings.introVideoId}`}
+                      title="Introduction video"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    ></iframe>
+                  </div>
+                ) : (
+                  <div className="rounded-xl border-2 border-dashed border-gray-300/50 bg-gray-50/30 relative pt-[56.25%] flex items-center justify-center">
+                    <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-500">
+                      <svg className="w-16 h-16 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                      </svg>
+                      <p className="text-sm">Add video in Admin Settings</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Right Column - Text */}
+              <div>
+                <p className="text-gray-700 text-2xl leading-relaxed">
+                  {uiSettings.introText || 'Add your introduction text in Admin Settings'}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Navigation Tabs - Hide on detail view */}
+        {currentView !== 'detail' && (
+          <div className="flex justify-center gap-2 flex-wrap">
+            <button
+              onClick={() => setCurrentView('catalog')}
+              className={`
+                            flex items-center gap-2 px-6 py-3 rounded-full border transition-all font-medium
+                            ${currentView === 'catalog'
+                  ? 'bg-primary text-black border-primary shadow-[0_0_20px_rgba(0,255,194,0.3)]'
+                  : 'bg-gray-100/50 text-textMuted border-gray-300 hover:border-slate-500 hover:text-gray-700'}
+                        `}
+            >
+              <IconGrid />
+              <span>Catalog</span>
+            </button>
+            <button
+              onClick={() => setCurrentView('checkout')}
+              className={`
+                            flex items-center gap-2 px-6 py-3 rounded-full border transition-all font-medium
+                            ${currentView === 'checkout'
+                  ? 'bg-primary text-black border-primary shadow-[0_0_20px_rgba(0,255,194,0.3)]'
+                  : 'bg-gray-100/50 text-textMuted border-gray-300 hover:border-slate-500 hover:text-gray-700'}
+                        `}
+            >
+              <IconCalculator />
+              <span>Checkout</span>
+            </button>
+            {isAdminAuthenticated && (
+              <button
+                onClick={() => setCurrentView('admin')}
+                className={`
+                                flex items-center gap-2 px-6 py-3 rounded-full border transition-all font-medium
+                                ${currentView === 'admin'
+                    ? 'bg-primary text-black border-primary shadow-[0_0_20px_rgba(0,255,194,0.3)]'
+                    : 'bg-gray-100/50 text-textMuted border-gray-300 hover:border-slate-500 hover:text-gray-700'}
+                            `}
+              >
+                <IconSettings />
+                <span>Admin</span>
+              </button>
+            )}
+          </div>
+        )}
+      </header>
+
+      {currentView === 'admin' ? (
+        <AdminPanel
+          services={services}
+          bundles={bundles}
+          onAdd={handleAddService}
+          onEdit={handleEditService}
+          onDelete={handleDeleteService}
+          onAddBundle={handleAddBundle}
+          onEditBundle={handleEditBundle}
+          onDeleteBundle={handleDeleteBundle}
+          uiSettings={uiSettings}
+          onUpdateSettings={setUiSettings}
+          onClose={() => setCurrentView('catalog')}
+        />
+      ) : currentView === 'catalog' ? (
+        <CatalogView services={services} onViewDetails={handleViewDetails} uiSettings={uiSettings} />
+      ) : currentView === 'detail' && selectedJob ? (
+        <JobDetailPage
+          job={selectedJob}
+          onBack={handleBackToCatalog}
+          onAddToCart={handleAddToCartFromDetail}
+        />
+      ) : (
+        <div className="flex flex-col lg:flex-row gap-8 relative flex-1">
+
+          {/* Left Column: Service Selector */}
+          <div className="w-full lg:w-1/2">
+            <div className="glass-panel rounded-2xl p-6 lg:p-8 h-full overflow-y-auto">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-semibold text-dark flex items-center gap-3 font-heading">
+                  <span className="w-1.5 h-8 bg-primary rounded-full shadow-[0_0_10px_#00FFC2]"></span>
+                  Build Your Package
+                </h2>
+                <div className="flex bg-gray-100/50 rounded-lg p-1">
+                  <button
+                    onClick={() => setCheckoutTab('jobs')}
+                    className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${checkoutTab === 'jobs' ? 'bg-primary text-black shadow-lg' : 'text-textMuted hover:text-dark'}`}
+                  >
+                    Jobs
+                  </button>
+                  <button
+                    onClick={() => setCheckoutTab('bundles')}
+                    className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${checkoutTab === 'bundles' ? 'bg-primary text-black shadow-lg' : 'text-textMuted hover:text-dark'}`}
+                  >
+                    Bundles
+                  </button>
+                </div>
+              </div>
+
+              <div className="mb-6 flex items-center gap-2 text-textMuted text-sm">
+                <IconDrag />
+                <span>Drag items to the right to build your stack</span>
+              </div>
+
+              {checkoutTab === 'bundles' ? (
+                <div className="grid grid-cols-1 gap-4 animate-fadeIn">
+                  {bundles.length > 0 ? (
+                    bundles.map(bundle => (
+                      <BundleCard
+                        key={bundle.id}
+                        bundle={bundle}
+                        services={services}
+                        onDragStart={handleDragStart}
+                      />
+                    ))
+                  ) : (
+                    <div className="text-center py-12 text-gray-600">
+                      No bundles available.
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 gap-4 animate-fadeIn">
+                  {services.length === 0 ? (
+                    <div className="text-center py-12 text-gray-600">
+                      No jobs available. Switch to Admin mode to add some.
+                    </div>
+                  ) : (
+                    services.map(service => (
+                      <ServiceCard
+                        key={service.id}
+                        service={service}
+                        onDragStart={handleDragStart}
+                      />
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Right Column: Summary / Cart */}
+          <div className="w-full lg:w-1/2">
+            <div
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              className={`
+                                glass-panel rounded-2xl p-6 lg:p-8 h-full flex flex-col transition-all duration-300 border-2
+                                ${isDraggingOver
+                  ? 'border-primary bg-primary/5 shadow-[0_0_30px_rgba(0,255,194,0.1)]'
+                  : 'border-transparent hover:border-slate-800'}
+                            `}
+            >
+              <h2 className="text-2xl font-semibold text-dark mb-8 flex items-center gap-3 font-heading">
+                <span className="w-1.5 h-8 bg-white rounded-full"></span>
+                Your Scope
+              </h2>
+
+              <div className="flex-1 min-h-[200px] mb-8">
+                {cartItems.length === 0 ? (
+                  <div className="h-full flex flex-col items-center justify-center text-gray-500 border-2 border-dashed border-slate-800 rounded-xl p-10">
+                    <IconDrag />
+                    <p className="mt-4 text-sm font-medium">Drag jobs here to build your scope</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {cartItems.map(item => (
+                      <CartItem
+                        key={item.uniqueId}
+                        service={item}
+                        onRemove={handleRemoveItem}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Footer / Totals */}
+              <div className="mt-auto pt-8 border-t border-gray-300">
+                <div className="flex justify-between items-end mb-8">
+                  <span className="text-textMuted font-medium">Estimated Total</span>
+                  <span className="text-4xl font-bold text-primary tracking-tight font-heading">
+                    ${totalCost.toLocaleString()}
+                  </span>
+                </div>
+
+                <button
+                  onClick={handleCheckout}
+                  disabled={cartItems.length === 0}
+                  className={`
+                                        w-full py-4 rounded-xl font-bold text-lg shadow-lg transition-all duration-300 text-black
+                                        ${cartItems.length === 0
+                      ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                      : 'bg-primary hover:bg-secondary hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]'}
+                                    `}
+                >
+                  {uiSettings.checkoutButtonText || 'Request Consultation'}
+                </button>
+                <p className="text-center text-textMuted text-sm mt-4">
+                  No payment required now. We'll review your request and contact you to discuss details.
+                </p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default App;

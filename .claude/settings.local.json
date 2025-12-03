@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(echo:*)",
+      "Bash(/opt/homebrew/bin/node:*)",
+      "Bash(/usr/local/bin/node --version)",
+      "Bash(source ~/.zshrc)",
+      "Bash(node --version:*)",
+      "Bash(npm run dev:*)",
+      "Bash(export PATH=\"/usr/local/bin:/opt/homebrew/bin:$PATH\")",
+      "Bash(/usr/local/bin/npm run dev)",
+      "Bash(PATH=\"/usr/local/bin:/opt/homebrew/bin:$PATH\" /usr/local/bin/npm run dev:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

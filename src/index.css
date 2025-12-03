@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background-color: #EDEDED;
+  color: #000000;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #EDEDED;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #CCCCCC;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #999999;
+}
+
+.glass-panel {
+  background: #FFFFFF;
+  border: 2px solid #DDDDDD;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.neon-shadow {
+  box-shadow: 0 0 20px rgba(0, 255, 194, 0.15);
+}
+
+/* Admin Table Styles */
+.admin-table th {
+  text-align: left;
+  padding: 1rem;
+  color: #666666;
+  font-weight: 500;
+  border-bottom: 1px solid #DDDDDD;
+}
+
+.admin-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #DDDDDD;
+}
+
+.admin-table tr:last-child td {
+  border-bottom: none;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out forwards;
+}

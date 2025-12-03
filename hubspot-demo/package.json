@@ -1,0 +1,19 @@
+{
+    "name": "hubspot-demo",
+    "version": "1.0.0",
+    "description": "Scripts to setup and simulate HubSpot demo scenarios",
+    "main": "index.js",
+    "scripts": {
+        "setup": "node setup-schema.js",
+        "seed": "node seed-data.js",
+        "seed-activities": "node seed-activities.js",
+        "simulate": "node simulate-events.js",
+        "upload-email": "node upload-email-template.js"
+    },
+    "dependencies": {
+        "@hubspot/api-client": "^11.0.0",
+        "@faker-js/faker": "^8.0.0",
+        "dotenv": "^16.0.0"
+    },
+    "type": "module"
+}
