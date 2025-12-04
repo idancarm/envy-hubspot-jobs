@@ -6,6 +6,7 @@ import AdminPanel from './components/AdminPanel';
 import ServiceCard from './components/ServiceCard';
 import BundleCard from './components/BundleCard';
 import CartItem from './components/CartItem';
+import { api } from './services/api';
 
 // Logo URLs
 const ENVY_LOGO_URL = "https://goenvy.io/wp-content/uploads/2022/10/ENVY-Logo.svg";
@@ -70,16 +71,26 @@ const DEFAULT_BUNDLES = [
   }
 ];
 
+const DEFAULT_UI_SETTINGS = {
+  siteTitle: 'Build Your Growth Stack',
+  siteSubtitle: 'Select the HubSpot jobs you need. No retainers. Just results.',
+  logoUrl: ENVY_LOGO_URL,
+  badgeUrl: HUBSPOT_BADGE_URL,
+  introVideoId: '',
+  introText: 'We help businesses grow with expert HubSpot services. No long-term commitments, just results.',
+  checkoutButtonText: 'Request Consultation',
+  catalogTitle: 'Job Catalog',
+  catalogSubtitle: 'Browse all available HubSpot jobs and their details'
+};
+
 function App() {
   // State
-  const [services, setServices] = useState(() => {
-    const saved = localStorage.getItem('envy_services');
-    return saved ? JSON.parse(saved) : DEFAULT_SERVICES;
-  });
-  const [bundles, setBundles] = useState(() => {
-    const saved = localStorage.getItem('envy_bundles');
-    return saved ? JSON.parse(saved) : DEFAULT_BUNDLES;
-  });
+  const [services, setServices] = useState([]);
+  const [bundles, setBundles] = useState([]);
+  const [uiSettings, setUiSettings] = useState(DEFAULT_UI_SETTINGS);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const [cartItems, setCartItems] = useState([]);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const [currentView, setCurrentView] = useState('catalog'); // 'checkout', 'catalog', 'admin', 'detail'
@@ -88,38 +99,63 @@ function App() {
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(() => {
     return localStorage.getItem('envy_admin_auth') === 'true';
   });
-  const [uiSettings, setUiSettings] = useState(() => {
-    const defaults = {
-      siteTitle: 'Build Your Growth Stack',
-      siteSubtitle: 'Select the HubSpot jobs you need. No retainers. Just results.',
-      logoUrl: ENVY_LOGO_URL,
-      badgeUrl: HUBSPOT_BADGE_URL,
-      introVideoId: '',
-      introText: 'We help businesses grow with expert HubSpot services. No long-term commitments, just results.',
-      checkoutButtonText: 'Request Consultation',
-      catalogTitle: 'Job Catalog',
-      catalogSubtitle: 'Browse all available HubSpot jobs and their details'
+
+  // Fetch Data
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+
+        // Fetch Services
+        let fetchedServices = await api.getServices();
+        if (!fetchedServices || fetchedServices.length === 0) {
+          // Fallback to defaults if DB is empty, but don't auto-write to avoid spamming
+          fetchedServices = DEFAULT_SERVICES;
+        }
+        setServices(fetchedServices);
+
+        // Fetch Bundles
+        let fetchedBundles = await api.getBundles();
+        if (!fetchedBundles || fetchedBundles.length === 0) {
+          fetchedBundles = DEFAULT_BUNDLES;
+        }
+        setBundles(fetchedBundles);
+
+        // Fetch Settings
+        const fetchedSettings = await api.getSettings();
+        if (fetchedSettings) {
+          const mappedSettings = {
+            siteTitle: fetchedSettings.site_title || fetchedSettings.siteTitle || DEFAULT_UI_SETTINGS.siteTitle,
+            siteSubtitle: fetchedSettings.site_subtitle || fetchedSettings.siteSubtitle || DEFAULT_UI_SETTINGS.siteSubtitle,
+            logoUrl: fetchedSettings.logo_url || fetchedSettings.logoUrl || DEFAULT_UI_SETTINGS.logoUrl,
+            badgeUrl: fetchedSettings.badge_url || fetchedSettings.badgeUrl || DEFAULT_UI_SETTINGS.badgeUrl,
+            introVideoId: fetchedSettings.intro_video_id || fetchedSettings.introVideoId || DEFAULT_UI_SETTINGS.introVideoId,
+            introText: fetchedSettings.intro_text || fetchedSettings.introText || DEFAULT_UI_SETTINGS.introText,
+            checkoutButtonText: fetchedSettings.checkout_button_text || fetchedSettings.checkoutButtonText || DEFAULT_UI_SETTINGS.checkoutButtonText,
+            catalogTitle: fetchedSettings.catalog_title || fetchedSettings.catalogTitle || DEFAULT_UI_SETTINGS.catalogTitle,
+            catalogSubtitle: fetchedSettings.catalog_subtitle || fetchedSettings.catalogSubtitle || DEFAULT_UI_SETTINGS.catalogSubtitle,
+          };
+          setUiSettings(mappedSettings);
+        }
+
+      } catch (err) {
+        console.error("Failed to fetch data:", err);
+        setError(err.message);
+        // Fallback to defaults on error
+        setServices(DEFAULT_SERVICES);
+        setBundles(DEFAULT_BUNDLES);
+      } finally {
+        setIsLoading(false);
+      }
     };
-    const saved = localStorage.getItem('envy_ui_settings');
-    return saved ? { ...defaults, ...JSON.parse(saved) } : defaults;
-  });
 
-  // Persistence
-  useEffect(() => {
-    localStorage.setItem('envy_services', JSON.stringify(services));
-  }, [services]);
+    fetchData();
+  }, []);
 
-  useEffect(() => {
-    localStorage.setItem('envy_bundles', JSON.stringify(bundles));
-  }, [bundles]);
-
+  // Persistence for Admin Auth only
   useEffect(() => {
     localStorage.setItem('envy_admin_auth', isAdminAuthenticated ? 'true' : 'false');
   }, [isAdminAuthenticated]);
-
-  useEffect(() => {
-    localStorage.setItem('envy_ui_settings', JSON.stringify(uiSettings));
-  }, [uiSettings]);
 
   // Admin Login
   const handleAdminLogin = () => {
@@ -138,33 +174,98 @@ function App() {
   };
 
   // Admin Handlers
-  const handleAddService = (newService) => {
-    const id = Math.max(...services.map(s => s.id), 0) + 1;
-    setServices([...services, { ...newService, id }]);
+  const handleAddService = async (newService) => {
+    try {
+      // Optimistic update
+      const tempId = Math.max(...services.map(s => s.id), 0) + 1;
+      const optimisitcService = { ...newService, id: tempId };
+      setServices([...services, optimisitcService]);
+
+      // API Call
+      const savedService = await api.addService(newService);
+      if (savedService) {
+        // Replace optimistic with real
+        setServices(prev => prev.map(s => s.id === tempId ? savedService : s));
+      }
+    } catch (err) {
+      console.error("Failed to add service:", err);
+      alert("Failed to save service to cloud.");
+    }
   };
 
-  const handleEditService = (id, updatedService) => {
-    setServices(services.map(s => s.id === id ? { ...updatedService, id } : s));
+  const handleEditService = async (id, updatedService) => {
+    try {
+      setServices(services.map(s => s.id === id ? { ...updatedService, id } : s));
+      await api.updateService(id, updatedService);
+    } catch (err) {
+      console.error("Failed to update service:", err);
+      alert("Failed to update service in cloud.");
+    }
   };
 
-  const handleDeleteService = (id) => {
-    setServices(services.filter(s => s.id !== id));
-    // Also remove from cart if present
-    setCartItems(cartItems.filter(item => item.id !== id));
+  const handleDeleteService = async (id) => {
+    try {
+      setServices(services.filter(s => s.id !== id));
+      setCartItems(cartItems.filter(item => item.id !== id));
+      await api.deleteService(id);
+    } catch (err) {
+      console.error("Failed to delete service:", err);
+      alert("Failed to delete service from cloud.");
+    }
   };
 
   // Bundle Handlers
-  const handleAddBundle = (newBundle) => {
-    const id = Math.max(...bundles.map(b => b.id), 0) + 1;
-    setBundles([...bundles, { ...newBundle, id }]);
+  const handleAddBundle = async (newBundle) => {
+    try {
+      const tempId = Math.max(...bundles.map(b => b.id), 0) + 1;
+      setBundles([...bundles, { ...newBundle, id: tempId }]);
+
+      const savedBundle = await api.addBundle(newBundle);
+      if (savedBundle) {
+        setBundles(prev => prev.map(b => b.id === tempId ? savedBundle : b));
+      }
+    } catch (err) {
+      console.error("Failed to add bundle:", err);
+    }
   };
 
-  const handleEditBundle = (id, updatedBundle) => {
-    setBundles(bundles.map(b => b.id === id ? { ...updatedBundle, id } : b));
+  const handleEditBundle = async (id, updatedBundle) => {
+    try {
+      setBundles(bundles.map(b => b.id === id ? { ...updatedBundle, id } : b));
+      await api.updateBundle(id, updatedBundle);
+    } catch (err) {
+      console.error("Failed to update bundle:", err);
+    }
   };
 
-  const handleDeleteBundle = (id) => {
-    setBundles(bundles.filter(b => b.id !== id));
+  const handleDeleteBundle = async (id) => {
+    try {
+      setBundles(bundles.filter(b => b.id !== id));
+      await api.deleteBundle(id);
+    } catch (err) {
+      console.error("Failed to delete bundle:", err);
+    }
+  };
+
+  const handleUpdateSettings = async (newSettings) => {
+    try {
+      setUiSettings(newSettings);
+      // Map back to snake_case for DB if needed
+      const dbSettings = {
+        site_title: newSettings.siteTitle,
+        site_subtitle: newSettings.siteSubtitle,
+        logo_url: newSettings.logoUrl,
+        badge_url: newSettings.badgeUrl,
+        intro_video_id: newSettings.introVideoId,
+        intro_text: newSettings.introText,
+        checkout_button_text: newSettings.checkoutButtonText,
+        catalog_title: newSettings.catalogTitle,
+        catalog_subtitle: newSettings.catalogSubtitle
+      };
+      await api.updateSettings(dbSettings);
+    } catch (err) {
+      console.error("Failed to update settings:", err);
+    }
   };
 
   // Drag & Drop Handlers
@@ -246,6 +347,10 @@ function App() {
     const newItem = { ...job, uniqueId: Date.now() + Math.random() };
     handleAddItemToCart(newItem);
   };
+
+  if (isLoading) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
 
   return (
     <div className="container mx-auto px-4 py-8 lg:py-16 max-w-7xl min-h-screen flex flex-col">
@@ -390,7 +495,7 @@ function App() {
           onEditBundle={handleEditBundle}
           onDeleteBundle={handleDeleteBundle}
           uiSettings={uiSettings}
-          onUpdateSettings={setUiSettings}
+          onUpdateSettings={handleUpdateSettings}
           onClose={() => setCurrentView('catalog')}
         />
       ) : currentView === 'catalog' ? (
