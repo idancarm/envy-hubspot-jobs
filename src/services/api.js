@@ -6,6 +6,12 @@ import { supabase } from '../lib/supabase';
 // Current app uses camelCase. Supabase usually uses snake_case.
 // We will handle mapping here.
 
+// Helper to map DB response to frontend model
+const mapServiceFromDb = (s) => ({
+    ...s,
+    youtubeVideoId: s.youtube_video_id,
+});
+
 export const api = {
     // --- Services ---
     getServices: async () => {
@@ -14,34 +20,45 @@ export const api = {
             .select('*')
             .order('id');
         if (error) throw error;
-        return data;
+        return data.map(mapServiceFromDb);
     },
 
     addService: async (service) => {
-        // Remove ID if it's auto-generated, or handle it.
-        // The app currently generates IDs manually. 
-        // We'll let the app generate ID or let DB do it. 
-        // For now, let's stick to the app's logic of generating IDs to keep it simple,
-        // or better, let's just insert and let DB handle it if we switch to UUIDs, 
-        // but the app relies on numeric IDs for bundles.
+        // Map camelCase to snake_case for DB
+        const dbPayload = {
+            ...service,
+            youtube_video_id: service.youtubeVideoId,
+        };
+        // Remove camelCase keys that aren't in DB (optional, but cleaner)
+        delete dbPayload.youtubeVideoId;
+        delete dbPayload.uniqueId; // client-side only
+
         const { data, error } = await supabase
             .from('services')
-            .insert([service])
+            .insert([dbPayload])
             .select()
             .single();
         if (error) throw error;
-        return data;
+        return mapServiceFromDb(data);
     },
 
     updateService: async (id, updates) => {
+        // Map camelCase to snake_case for DB
+        const dbPayload = {
+            ...updates,
+            youtube_video_id: updates.youtubeVideoId,
+        };
+        delete dbPayload.youtubeVideoId;
+        delete dbPayload.uniqueId;
+
         const { data, error } = await supabase
             .from('services')
-            .update(updates)
+            .update(dbPayload)
             .eq('id', id)
             .select()
             .single();
         if (error) throw error;
-        return data;
+        return mapServiceFromDb(data);
     },
 
     deleteService: async (id) => {
