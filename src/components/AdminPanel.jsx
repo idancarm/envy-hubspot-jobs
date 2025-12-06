@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { IconClose, IconSettings, IconEdit, IconTrash } from './Icons';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 const AdminPanel = ({ services, bundles, onAdd, onEdit, onDelete, onAddBundle, onEditBundle, onDeleteBundle, uiSettings, onUpdateSettings, onClose }) => {
     const [activeTab, setActiveTab] = useState('services');
@@ -202,21 +204,22 @@ const AdminPanel = ({ services, bundles, onAdd, onEdit, onDelete, onAddBundle, o
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-xs text-textMuted mb-1">Description</label>
-                                <textarea
-                                    value={serviceForm.description}
-                                    onChange={e => setServiceForm({ ...serviceForm, description: e.target.value })}
-                                    className="w-full bg-gray-100 border border-gray-300 rounded-lg px-3 py-2 text-dark text-sm focus:border-primary focus:outline-none resize-none h-20"
-                                    required
-                                />
-                            </div>
-                            <div>
                                 <label className="block text-xs text-textMuted mb-1">Details (Full Overview)</label>
-                                <textarea
-                                    value={serviceForm.details}
-                                    onChange={e => setServiceForm({ ...serviceForm, details: e.target.value })}
-                                    className="w-full bg-gray-100 border border-gray-300 rounded-lg px-3 py-2 text-dark text-sm focus:border-primary focus:outline-none resize-none h-24"
-                                />
+                                <div className="bg-white rounded-lg text-dark">
+                                    <ReactQuill
+                                        theme="snow"
+                                        value={serviceForm.details}
+                                        onChange={value => setServiceForm({ ...serviceForm, details: value })}
+                                        className="h-40 mb-12" // Add margin-bottom to clear toolbar if needed
+                                        modules={{
+                                            toolbar: [
+                                                ['bold', 'italic', 'underline'],
+                                                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                                ['clean']
+                                            ]
+                                        }}
+                                    />
+                                </div>
                             </div>
                             <div>
                                 <label className="block text-xs text-textMuted mb-1">Deliverables (comma separated)</label>

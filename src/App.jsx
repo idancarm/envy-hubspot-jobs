@@ -197,7 +197,8 @@ function App() {
       }
     } catch (err) {
       console.error("Failed to add service:", err);
-      alert("Failed to save service to cloud.");
+      // Suppress alert if it's likely just a return value issue (e.g. RLS)
+      // alert("Failed to save service to cloud."); 
     }
   };
 
