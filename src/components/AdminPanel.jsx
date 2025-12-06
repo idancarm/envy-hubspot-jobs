@@ -204,6 +204,15 @@ const AdminPanel = ({ services, bundles, onAdd, onEdit, onDelete, onAddBundle, o
                                 </div>
                             </div>
                             <div>
+                                <label className="block text-xs text-textMuted mb-1">Description (Short Summary)</label>
+                                <textarea
+                                    value={serviceForm.description}
+                                    onChange={e => setServiceForm({ ...serviceForm, description: e.target.value })}
+                                    className="w-full bg-gray-100 border border-gray-300 rounded-lg px-3 py-2 text-dark text-sm focus:border-primary focus:outline-none resize-none h-20"
+                                    required
+                                />
+                            </div>
+                            <div>
                                 <label className="block text-xs text-textMuted mb-1">Details (Full Overview)</label>
                                 <div className="bg-white rounded-lg text-dark">
                                     <ReactQuill
