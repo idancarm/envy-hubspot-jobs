@@ -6,11 +6,17 @@ import AdminPanel from './components/AdminPanel';
 import ServiceCard from './components/ServiceCard';
 import BundleCard from './components/BundleCard';
 import CartItem from './components/CartItem';
+import CheckoutModal from './components/CheckoutModal';
 import { api } from './services/api';
+import { submitToHubSpot } from './services/hubspot';
 
 // Logo URLs
 const ENVY_LOGO_URL = "https://goenvy.io/wp-content/uploads/2022/10/ENVY-Logo.svg";
 const HUBSPOT_BADGE_URL = "https://l.goenvy.io/hubfs/elite.svg";
+
+// HubSpot Configuration
+const HUBSPOT_PORTAL_ID = import.meta.env.VITE_HUBSPOT_PORTAL_ID;
+const HUBSPOT_FORM_GUID = import.meta.env.VITE_HUBSPOT_FORM_GUID;
 
 // --- Data ---
 const DEFAULT_SERVICES = [
@@ -89,6 +95,8 @@ function App() {
   const [bundles, setBundles] = useState([]);
   const [uiSettings, setUiSettings] = useState(DEFAULT_UI_SETTINGS);
   const [isLoading, setIsLoading] = useState(true);
+  const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
   const [cartItems, setCartItems] = useState([]);
@@ -326,11 +334,55 @@ function App() {
     return cartItems.reduce((sum, item) => sum + item.price, 0);
   }, [cartItems]);
 
-  const handleCheckout = () => {
-    console.log("--- Checkout Initiated ---");
-    console.log("Selected Services:", cartItems);
-    console.log("Total Estimated Cost: $" + totalCost);
-    alert(`Checkout initiated!\n\nTotal: $${totalCost.toLocaleString()}\nCheck console for details.`);
+  const handleCheckoutInitiate = () => {
+    if (cartItems.length === 0) {
+      alert("Your cart is empty.");
+      return;
+    }
+    setIsCheckoutModalOpen(true);
+  };
+
+  const handleModalSubmit = async (formData) => {
+    const { firstName, lastName, email } = formData;
+
+    try {
+      setIsSubmitting(true);
+
+      // Format cart items for the message
+      const description = cartItems.map(item =>
+        `- ${item.name} ($${item.price})`
+      ).join('\n');
+
+      const message = `Selected Services:\n${description}\n\nTotal Estimated Cost: $${totalCost.toLocaleString()}`;
+
+      // HubSpot Form Fields
+      const fields = [
+        { name: 'email', value: email },
+        { name: 'firstname', value: firstName },
+        { name: 'lastname', value: lastName },
+        { name: 'message', value: message },
+      ];
+
+      // Submit to HubSpot
+      await submitToHubSpot(HUBSPOT_PORTAL_ID, HUBSPOT_FORM_GUID, fields);
+
+      console.log("HubSpot submission successful");
+      setIsCheckoutModalOpen(false);
+      alert(`Thank you, ${firstName}! Your request has been received.\n\nWe have sent a confirmation to ${email}.`);
+
+      setCartItems([]); // Clear the cart
+      setCurrentView('catalog'); // Return to catalog
+
+    } catch (err) {
+      console.error("Checkout validation failed:", err);
+      if (err.message.includes("PortalId") || !HUBSPOT_PORTAL_ID) {
+        alert("Configuration Error: Please check your .env file for VITE_HUBSPOT_PORTAL_ID.");
+      } else {
+        alert("Sorry, there was a problem submitting your request. Please try again.");
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleViewDetails = (job) => {
@@ -622,11 +674,11 @@ function App() {
                 </div>
 
                 <button
-                  onClick={handleCheckout}
+                  onClick={handleCheckoutInitiate}
                   disabled={cartItems.length === 0}
                   className={`
                                         w-full py-4 rounded-xl font-bold text-lg shadow-lg transition-all duration-300 text-black
-                                        ${cartItems.length === 0
+                                        ${cartItems.length === 0 || isSubmitting
                       ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                       : 'bg-primary hover:bg-secondary hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]'}
                                     `}
@@ -642,6 +694,12 @@ function App() {
 
         </div>
       )}
+      <CheckoutModal
+        isOpen={isCheckoutModalOpen}
+        onClose={() => setIsCheckoutModalOpen(false)}
+        onSubmit={handleModalSubmit}
+        isSubmitting={isSubmitting}
+      />
     </div>
   );
 }
