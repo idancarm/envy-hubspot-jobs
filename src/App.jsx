@@ -208,7 +208,8 @@ function App() {
       await api.updateService(id, updatedService);
     } catch (err) {
       console.error("Failed to update service:", err);
-      alert("Failed to update service in cloud.");
+      // If the error relates to a missing column, it will say so
+      alert(`Failed to update service in cloud. Error: ${err.message}`);
     }
   };
 
