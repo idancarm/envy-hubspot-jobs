@@ -18,7 +18,18 @@ export const api = {
         const { data, error } = await supabase
             .from('services')
             .select('*')
-            .order('id');
+            .order('sort_order', { ascending: true })
+            .order('id', { ascending: true }); // Fallback
+        if (error) throw error;
+        return data.map(mapServiceFromDb);
+    },
+
+    updateServicesOrder: async (updates) => {
+        // updates is array of { id, sort_order }
+        const { data, error } = await supabase
+            .from('services')
+            .upsert(updates)
+            .select();
         if (error) throw error;
         return data.map(mapServiceFromDb);
     },

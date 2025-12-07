@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { IconClose, IconSettings, IconEdit, IconTrash } from './Icons';
+import { IconClose, IconSettings, IconEdit, IconTrash, IconDrag } from './Icons';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
-const AdminPanel = ({ services, bundles, onAdd, onEdit, onDelete, onAddBundle, onEditBundle, onDeleteBundle, uiSettings, onUpdateSettings, onClose }) => {
+const AdminPanel = ({ services, bundles, onAdd, onEdit, onDelete, onReorder, onAddBundle, onEditBundle, onDeleteBundle, uiSettings, onUpdateSettings, onClose }) => {
+
     const [activeTab, setActiveTab] = useState('services');
     const [editingId, setEditingId] = useState(null);
 
@@ -126,6 +127,35 @@ const AdminPanel = ({ services, bundles, onAdd, onEdit, onDelete, onAddBundle, o
             ...prev,
             screenshots: prev.screenshots.map((s, i) => i === index ? { ...s, [field]: value } : s)
         }));
+    };
+
+    // Drag and Drop Handlers
+    const [draggedItemIndex, setDraggedItemIndex] = useState(null);
+
+    const handleDragStart = (e, index) => {
+        setDraggedItemIndex(index);
+        e.dataTransfer.effectAllowed = "move";
+        // e.dataTransfer.setDragImage(e.target, 0, 0); 
+    };
+
+    const handleDragOver = (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
+    };
+
+    const handleDrop = (e, dropIndex) => {
+        e.preventDefault();
+        if (draggedItemIndex === null) return;
+        if (draggedItemIndex === dropIndex) return;
+        if (activeTab !== 'services' || !onReorder) return;
+
+        // Move item
+        const newServices = [...services];
+        const [movedItem] = newServices.splice(draggedItemIndex, 1);
+        newServices.splice(dropIndex, 0, movedItem);
+
+        onReorder(newServices);
+        setDraggedItemIndex(null);
     };
 
     return (
@@ -435,19 +465,32 @@ const AdminPanel = ({ services, bundles, onAdd, onEdit, onDelete, onAddBundle, o
                         </h3>
                     </div>
                     <div className="overflow-y-auto flex-1 p-4">
-                        <table className="w-full admin-table text-sm">
+                        <table className="w-full admin-table text-sm table-fixed">
                             <thead>
                                 <tr>
-                                    <th>Name</th>
-                                    <th>{activeTab === 'services' ? 'Description' : 'Contents'}</th>
-                                    <th>Price</th>
-                                    <th className="text-right">Actions</th>
+                                    <th className="w-8"></th>
+                                    <th className="w-1/4">Name</th>
+                                    <th className="w-5/12">{activeTab === 'services' ? 'Description' : 'Contents'}</th>
+                                    <th className="w-1/6">Price</th>
+                                    <th className="w-1/6 text-right">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {activeTab === 'services' ? (
-                                    services.map(service => (
-                                        <tr key={service.id} className="hover:bg-gray-100/30 transition-colors">
+                                    services.map((service, index) => (
+                                        <tr
+                                            key={service.id}
+                                            draggable
+                                            onDragStart={(e) => handleDragStart(e, index)}
+                                            onDragOver={handleDragOver}
+                                            onDrop={(e) => handleDrop(e, index)}
+                                            className={`hover:bg-gray-100/30 transition-colors ${draggedItemIndex === index ? 'opacity-50 settings_drag_dragging' : ''}`}
+                                        >
+                                            <td className="w-8 text-center cursor-move text-textMuted hover:text-dark">
+                                                <div className="w-full h-full flex items-center justify-center">
+                                                    <IconDrag />
+                                                </div>
+                                            </td>
                                             <td className="font-medium text-dark">{service.name}</td>
                                             <td className="text-textMuted truncate max-w-xs">{service.description}</td>
                                             <td className="text-primary font-medium">${service.price.toLocaleString()}</td>
@@ -466,6 +509,7 @@ const AdminPanel = ({ services, bundles, onAdd, onEdit, onDelete, onAddBundle, o
                                 ) : activeTab === 'bundles' ? (
                                     bundles.map(bundle => (
                                         <tr key={bundle.id} className="hover:bg-gray-100/30 transition-colors">
+                                            <td className="w-8"></td> {/* Spacer for bundles if not sortable yet */}
                                             <td className="font-medium text-dark">
                                                 {bundle.name}
                                                 <span className="ml-2 text-xs bg-primary/20 text-primary px-1.5 py-0.5 rounded">-{bundle.discount}%</span>
@@ -488,7 +532,7 @@ const AdminPanel = ({ services, bundles, onAdd, onEdit, onDelete, onAddBundle, o
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="4" className="text-center py-12 text-gray-600">
+                                        <td colSpan="5" className="text-center py-12 text-gray-600">
                                             <div className="flex flex-col items-center gap-4">
                                                 <div className="p-4 rounded-full bg-gray-100/50">
                                                     <IconSettings />

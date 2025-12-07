@@ -220,7 +220,26 @@ function App() {
       await api.deleteService(id);
     } catch (err) {
       console.error("Failed to delete service:", err);
-      alert("Failed to delete service from cloud.");
+      // Suppress or format error
+      alert(`Failed to delete service from cloud. Error: ${err.message || err}`);
+    }
+  };
+
+  const handleReorderServices = async (reorderedServices) => {
+    try {
+      // Optimistic update
+      setServices(reorderedServices);
+
+      // Prepare payload: map each service to its new index
+      const updates = reorderedServices.map((s, index) => ({
+        id: s.id,
+        sort_order: index
+      }));
+
+      await api.updateServicesOrder(updates);
+    } catch (err) {
+      console.error("Failed to reorder services:", err);
+      alert("Failed to save service order.");
     }
   };
 
@@ -545,6 +564,7 @@ function App() {
           onAdd={handleAddService}
           onEdit={handleEditService}
           onDelete={handleDeleteService}
+          onReorder={handleReorderServices}
           onAddBundle={handleAddBundle}
           onEditBundle={handleEditBundle}
           onDeleteBundle={handleDeleteBundle}
