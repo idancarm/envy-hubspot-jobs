@@ -7,6 +7,7 @@ const AdminPanel = ({ services, bundles, onAdd, onEdit, onDelete, onReorder, onA
 
     const [activeTab, setActiveTab] = useState('services');
     const [editingId, setEditingId] = useState(null);
+    const [editingType, setEditingType] = useState(null); // 'service' or 'bundle'
 
     // Settings Form
     const [settingsForm, setSettingsForm] = useState(uiSettings || {});
@@ -20,11 +21,62 @@ const AdminPanel = ({ services, bundles, onAdd, onEdit, onDelete, onReorder, onA
         onUpdateSettings(settingsForm);
     };
 
-    // Service Form
-    const [serviceForm, setServiceForm] = useState({ name: '', description: '', price: '', details: '', timeline: '', deliverables: '', youtubeVideoId: '', screenshots: [] });
+    // Service Form - initialize with empty values
+    const getEmptyServiceForm = () => ({
+        name: '',
+        description: '',
+        price: '',
+        details: '',
+        timeline: '',
+        deliverables: '',
+        youtubeVideoId: '',
+        screenshots: []
+    });
+
+    const [serviceForm, setServiceForm] = useState(getEmptyServiceForm());
 
     // Bundle Form
-    const [bundleForm, setBundleForm] = useState({ name: '', description: '', discount: '', serviceIds: [] });
+    const getEmptyBundleForm = () => ({
+        name: '',
+        description: '',
+        discount: '',
+        serviceIds: []
+    });
+
+    const [bundleForm, setBundleForm] = useState(getEmptyBundleForm());
+
+    // Effect to populate form when editingId changes
+    useEffect(() => {
+        if (editingId === null) {
+            return;
+        }
+
+        if (editingType === 'service') {
+            const item = services.find(s => s.id === editingId);
+            if (item) {
+                setServiceForm({
+                    name: item.name || '',
+                    description: item.description || '',
+                    price: item.price || '',
+                    details: item.details || '',
+                    timeline: item.timeline || '',
+                    deliverables: Array.isArray(item.deliverables) ? item.deliverables.join(', ') : (item.deliverables || ''),
+                    youtubeVideoId: item.youtubeVideoId || '',
+                    screenshots: item.screenshots || []
+                });
+            }
+        } else if (editingType === 'bundle') {
+            const item = bundles.find(b => b.id === editingId);
+            if (item) {
+                setBundleForm({
+                    name: item.name || '',
+                    description: item.description || '',
+                    discount: item.discount || '',
+                    serviceIds: item.serviceIds || []
+                });
+            }
+        }
+    }, [editingId, editingType, services, bundles]);
 
     const handleServiceSubmit = (e) => {
         e.preventDefault();
@@ -70,32 +122,22 @@ const AdminPanel = ({ services, bundles, onAdd, onEdit, onDelete, onReorder, onA
     };
 
     const handleEditClick = (item, type) => {
-        setEditingId(item.id);
+        // First reset the forms to clear any stale data
         if (type === 'service') {
-            setServiceForm({
-                name: item.name,
-                description: item.description,
-                price: item.price,
-                details: item.details || '',
-                timeline: item.timeline || '',
-                deliverables: Array.isArray(item.deliverables) ? item.deliverables.join(', ') : (item.deliverables || ''),
-                youtubeVideoId: item.youtubeVideoId || '',
-                screenshots: item.screenshots || []
-            });
+            setServiceForm(getEmptyServiceForm());
         } else {
-            setBundleForm({
-                name: item.name,
-                description: item.description,
-                discount: item.discount,
-                serviceIds: item.serviceIds || []
-            });
+            setBundleForm(getEmptyBundleForm());
         }
+        // Then set the editing state - the useEffect will populate the form
+        setEditingType(type);
+        setEditingId(item.id);
     };
 
     const resetForms = () => {
         setEditingId(null);
-        setServiceForm({ name: '', description: '', price: '', details: '', timeline: '', deliverables: '', youtubeVideoId: '', screenshots: [] });
-        setBundleForm({ name: '', description: '', discount: '', serviceIds: [] });
+        setEditingType(null);
+        setServiceForm(getEmptyServiceForm());
+        setBundleForm(getEmptyBundleForm());
     };
 
     const toggleServiceInBundle = (serviceId) => {
