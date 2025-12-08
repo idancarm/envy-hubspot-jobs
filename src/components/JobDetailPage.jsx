@@ -61,7 +61,10 @@ const JobDetailPage = ({ job, onBack, onAddToCart }) => {
                                 <span className="w-2 h-10 bg-primary rounded-full"></span>
                                 What We'll Do
                             </h3>
-                            <p className="text-gray-700 leading-relaxed text-lg lg:text-xl">{job.details || job.description}</p>
+                            <div
+                                className="text-gray-700 leading-relaxed text-lg lg:text-xl prose prose-lg max-w-none"
+                                dangerouslySetInnerHTML={{ __html: job.details || job.description }}
+                            />
                         </div>
 
                         <div>
