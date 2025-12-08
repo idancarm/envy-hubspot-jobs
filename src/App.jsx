@@ -503,16 +503,6 @@ function App() {
         {/* Intro Section - Video and Stats */}
         {currentView !== 'detail' && (
           <div className="glass-panel rounded-2xl p-8 lg:p-12 mb-8 max-w-6xl mx-auto overflow-hidden">
-            {/* Hero Headline */}
-            <div className="text-center mb-10">
-              <h2 className="text-3xl lg:text-5xl font-bold text-dark mb-3 tracking-tight font-heading">
-                {uiSettings.heroHeadline}
-              </h2>
-              <p className="text-textMuted text-lg max-w-2xl mx-auto">
-                {uiSettings.heroSubheadline}
-              </p>
-            </div>
-
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
               {/* Left Column - Video */}
               <div>

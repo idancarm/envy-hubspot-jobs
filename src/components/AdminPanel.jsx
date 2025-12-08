@@ -494,31 +494,13 @@ const AdminPanel = ({ services, bundles, onAdd, onEdit, onDelete, onReorder, onA
                                 />
                             </div>
 
-                            {/* Hero Section Settings */}
+                            {/* Trust Badges Settings */}
                             <div className="border-t border-gray-200 pt-4 mt-4">
                                 <h4 className="text-sm font-semibold text-dark mb-3 flex items-center gap-2">
                                     <span className="w-1 h-4 bg-primary rounded-full"></span>
-                                    Hero Section
+                                    Trust Badges
                                 </h4>
                                 <div className="space-y-3">
-                                    <div>
-                                        <label className="block text-xs text-textMuted mb-1">Hero Headline</label>
-                                        <input
-                                            type="text"
-                                            value={settingsForm.heroHeadline || ''}
-                                            onChange={e => setSettingsForm({ ...settingsForm, heroHeadline: e.target.value })}
-                                            className="w-full bg-gray-100 border border-gray-300 rounded-lg px-3 py-2 text-dark text-sm focus:border-primary focus:outline-none"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-xs text-textMuted mb-1">Hero Subheadline</label>
-                                        <input
-                                            type="text"
-                                            value={settingsForm.heroSubheadline || ''}
-                                            onChange={e => setSettingsForm({ ...settingsForm, heroSubheadline: e.target.value })}
-                                            className="w-full bg-gray-100 border border-gray-300 rounded-lg px-3 py-2 text-dark text-sm focus:border-primary focus:outline-none"
-                                        />
-                                    </div>
 
                                     {/* Badge 1 */}
                                     <div className="grid grid-cols-2 gap-2">
