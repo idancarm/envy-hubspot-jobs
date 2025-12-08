@@ -200,7 +200,7 @@ const AdminPanel = ({ services, bundles, onAdd, onEdit, onDelete, onReorder, onA
                     </h3>
 
                     {activeTab === 'services' ? (
-                        <form onSubmit={handleServiceSubmit} className="space-y-4">
+                        <form key={`service-form-${editingId || 'new'}`} onSubmit={handleServiceSubmit} className="space-y-4">
                             <div>
                                 <label className="block text-xs text-textMuted mb-1">Name</label>
                                 <input
@@ -246,6 +246,7 @@ const AdminPanel = ({ services, bundles, onAdd, onEdit, onDelete, onReorder, onA
                                 <label className="block text-xs text-textMuted mb-1">Details (Full Overview)</label>
                                 <div className="bg-white rounded-lg text-dark">
                                     <ReactQuill
+                                        key={editingId || 'new'} // Force remount when editing different service
                                         theme="snow"
                                         value={serviceForm.details}
                                         onChange={value => setServiceForm({ ...serviceForm, details: value })}
