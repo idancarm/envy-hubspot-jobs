@@ -504,9 +504,10 @@ function App() {
 
               {/* Right Column - Text */}
               <div>
-                <p className="text-gray-700 text-2xl leading-relaxed">
-                  {uiSettings.introText || 'Add your introduction text in Admin Settings'}
-                </p>
+                <div
+                  className="text-gray-700 text-2xl leading-relaxed prose prose-lg max-w-none"
+                  dangerouslySetInnerHTML={{ __html: uiSettings.introText || 'Add your introduction text in Admin Settings' }}
+                />
               </div>
             </div>
           </div>
