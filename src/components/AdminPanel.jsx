@@ -493,6 +493,101 @@ const AdminPanel = ({ services, bundles, onAdd, onEdit, onDelete, onReorder, onA
                                     className="w-full bg-gray-100 border border-gray-300 rounded-lg px-3 py-2 text-dark text-sm focus:border-primary focus:outline-none"
                                 />
                             </div>
+
+                            {/* Hero Section Settings */}
+                            <div className="border-t border-gray-200 pt-4 mt-4">
+                                <h4 className="text-sm font-semibold text-dark mb-3 flex items-center gap-2">
+                                    <span className="w-1 h-4 bg-primary rounded-full"></span>
+                                    Hero Section
+                                </h4>
+                                <div className="space-y-3">
+                                    <div>
+                                        <label className="block text-xs text-textMuted mb-1">Hero Headline</label>
+                                        <input
+                                            type="text"
+                                            value={settingsForm.heroHeadline || ''}
+                                            onChange={e => setSettingsForm({ ...settingsForm, heroHeadline: e.target.value })}
+                                            className="w-full bg-gray-100 border border-gray-300 rounded-lg px-3 py-2 text-dark text-sm focus:border-primary focus:outline-none"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs text-textMuted mb-1">Hero Subheadline</label>
+                                        <input
+                                            type="text"
+                                            value={settingsForm.heroSubheadline || ''}
+                                            onChange={e => setSettingsForm({ ...settingsForm, heroSubheadline: e.target.value })}
+                                            className="w-full bg-gray-100 border border-gray-300 rounded-lg px-3 py-2 text-dark text-sm focus:border-primary focus:outline-none"
+                                        />
+                                    </div>
+
+                                    {/* Badge 1 */}
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label className="block text-xs text-textMuted mb-1">Badge 1 Title</label>
+                                            <input
+                                                type="text"
+                                                value={settingsForm.heroBadge1Title || ''}
+                                                onChange={e => setSettingsForm({ ...settingsForm, heroBadge1Title: e.target.value })}
+                                                className="w-full bg-gray-100 border border-gray-300 rounded-lg px-3 py-2 text-dark text-sm focus:border-primary focus:outline-none"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs text-textMuted mb-1">Badge 1 Subtitle</label>
+                                            <input
+                                                type="text"
+                                                value={settingsForm.heroBadge1Subtitle || ''}
+                                                onChange={e => setSettingsForm({ ...settingsForm, heroBadge1Subtitle: e.target.value })}
+                                                className="w-full bg-gray-100 border border-gray-300 rounded-lg px-3 py-2 text-dark text-sm focus:border-primary focus:outline-none"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Badge 2 */}
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label className="block text-xs text-textMuted mb-1">Badge 2 Title</label>
+                                            <input
+                                                type="text"
+                                                value={settingsForm.heroBadge2Title || ''}
+                                                onChange={e => setSettingsForm({ ...settingsForm, heroBadge2Title: e.target.value })}
+                                                className="w-full bg-gray-100 border border-gray-300 rounded-lg px-3 py-2 text-dark text-sm focus:border-primary focus:outline-none"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs text-textMuted mb-1">Badge 2 Subtitle</label>
+                                            <input
+                                                type="text"
+                                                value={settingsForm.heroBadge2Subtitle || ''}
+                                                onChange={e => setSettingsForm({ ...settingsForm, heroBadge2Subtitle: e.target.value })}
+                                                className="w-full bg-gray-100 border border-gray-300 rounded-lg px-3 py-2 text-dark text-sm focus:border-primary focus:outline-none"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Badge 3 */}
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label className="block text-xs text-textMuted mb-1">Badge 3 Title</label>
+                                            <input
+                                                type="text"
+                                                value={settingsForm.heroBadge3Title || ''}
+                                                onChange={e => setSettingsForm({ ...settingsForm, heroBadge3Title: e.target.value })}
+                                                className="w-full bg-gray-100 border border-gray-300 rounded-lg px-3 py-2 text-dark text-sm focus:border-primary focus:outline-none"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs text-textMuted mb-1">Badge 3 Subtitle</label>
+                                            <input
+                                                type="text"
+                                                value={settingsForm.heroBadge3Subtitle || ''}
+                                                onChange={e => setSettingsForm({ ...settingsForm, heroBadge3Subtitle: e.target.value })}
+                                                className="w-full bg-gray-100 border border-gray-300 rounded-lg px-3 py-2 text-dark text-sm focus:border-primary focus:outline-none"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <button type="submit" className="w-full bg-primary text-black font-bold py-2 rounded-lg hover:bg-secondary transition-colors text-sm">
                                 Save Settings
                             </button>

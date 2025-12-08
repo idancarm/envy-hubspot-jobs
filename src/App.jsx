@@ -86,7 +86,16 @@ const DEFAULT_UI_SETTINGS = {
   introText: 'We help businesses grow with expert HubSpot services. No long-term commitments, just results.',
   checkoutButtonText: 'Request Consultation',
   catalogTitle: 'Job Catalog',
-  catalogSubtitle: 'Browse all available HubSpot jobs and their details'
+  catalogSubtitle: 'Browse all available HubSpot jobs and their details',
+  // Hero section text
+  heroHeadline: 'Your HubSpot Tune-Up Starts Here',
+  heroSubheadline: 'Fixed-scope projects led by senior RevOps experts. No retainers, no fluff.',
+  heroBadge1Title: '100+ Portals',
+  heroBadge1Subtitle: 'Managed by our senior team',
+  heroBadge2Title: 'Fixed Scope',
+  heroBadge2Subtitle: 'Clear deliverables, no surprises',
+  heroBadge3Title: 'Fast Delivery',
+  heroBadge3Subtitle: 'Most jobs done in days, not weeks'
 };
 
 function App() {
@@ -142,6 +151,15 @@ function App() {
             checkoutButtonText: fetchedSettings.checkout_button_text || fetchedSettings.checkoutButtonText || DEFAULT_UI_SETTINGS.checkoutButtonText,
             catalogTitle: fetchedSettings.catalog_title || fetchedSettings.catalogTitle || DEFAULT_UI_SETTINGS.catalogTitle,
             catalogSubtitle: fetchedSettings.catalog_subtitle || fetchedSettings.catalogSubtitle || DEFAULT_UI_SETTINGS.catalogSubtitle,
+            // Hero section fields
+            heroHeadline: fetchedSettings.hero_headline || fetchedSettings.heroHeadline || DEFAULT_UI_SETTINGS.heroHeadline,
+            heroSubheadline: fetchedSettings.hero_subheadline || fetchedSettings.heroSubheadline || DEFAULT_UI_SETTINGS.heroSubheadline,
+            heroBadge1Title: fetchedSettings.hero_badge1_title || fetchedSettings.heroBadge1Title || DEFAULT_UI_SETTINGS.heroBadge1Title,
+            heroBadge1Subtitle: fetchedSettings.hero_badge1_subtitle || fetchedSettings.heroBadge1Subtitle || DEFAULT_UI_SETTINGS.heroBadge1Subtitle,
+            heroBadge2Title: fetchedSettings.hero_badge2_title || fetchedSettings.heroBadge2Title || DEFAULT_UI_SETTINGS.heroBadge2Title,
+            heroBadge2Subtitle: fetchedSettings.hero_badge2_subtitle || fetchedSettings.heroBadge2Subtitle || DEFAULT_UI_SETTINGS.heroBadge2Subtitle,
+            heroBadge3Title: fetchedSettings.hero_badge3_title || fetchedSettings.heroBadge3Title || DEFAULT_UI_SETTINGS.heroBadge3Title,
+            heroBadge3Subtitle: fetchedSettings.hero_badge3_subtitle || fetchedSettings.heroBadge3Subtitle || DEFAULT_UI_SETTINGS.heroBadge3Subtitle,
           };
           setUiSettings(mappedSettings);
         }
@@ -289,7 +307,16 @@ function App() {
         intro_text: newSettings.introText,
         checkout_button_text: newSettings.checkoutButtonText,
         catalog_title: newSettings.catalogTitle,
-        catalog_subtitle: newSettings.catalogSubtitle
+        catalog_subtitle: newSettings.catalogSubtitle,
+        // Hero section fields
+        hero_headline: newSettings.heroHeadline,
+        hero_subheadline: newSettings.heroSubheadline,
+        hero_badge1_title: newSettings.heroBadge1Title,
+        hero_badge1_subtitle: newSettings.heroBadge1Subtitle,
+        hero_badge2_title: newSettings.heroBadge2Title,
+        hero_badge2_subtitle: newSettings.heroBadge2Subtitle,
+        hero_badge3_title: newSettings.heroBadge3Title,
+        hero_badge3_subtitle: newSettings.heroBadge3Subtitle
       };
       await api.updateSettings(dbSettings);
     } catch (err) {
@@ -479,10 +506,10 @@ function App() {
             {/* Hero Headline */}
             <div className="text-center mb-10">
               <h2 className="text-3xl lg:text-5xl font-bold text-dark mb-3 tracking-tight font-heading">
-                Your HubSpot Tune-Up Starts Here
+                {uiSettings.heroHeadline}
               </h2>
               <p className="text-textMuted text-lg max-w-2xl mx-auto">
-                Fixed-scope projects led by senior RevOps experts. No retainers, no fluff.
+                {uiSettings.heroSubheadline}
               </p>
             </div>
 
@@ -523,8 +550,8 @@ function App() {
                       </svg>
                     </div>
                     <div>
-                      <div className="text-2xl font-bold text-dark">100+ Portals</div>
-                      <div className="text-textMuted text-sm">Managed by our senior team</div>
+                      <div className="text-2xl font-bold text-dark">{uiSettings.heroBadge1Title}</div>
+                      <div className="text-textMuted text-sm">{uiSettings.heroBadge1Subtitle}</div>
                     </div>
                   </div>
                 </div>
@@ -538,8 +565,8 @@ function App() {
                       </svg>
                     </div>
                     <div>
-                      <div className="text-2xl font-bold text-dark">Fixed Scope</div>
-                      <div className="text-textMuted text-sm">Clear deliverables, no surprises</div>
+                      <div className="text-2xl font-bold text-dark">{uiSettings.heroBadge2Title}</div>
+                      <div className="text-textMuted text-sm">{uiSettings.heroBadge2Subtitle}</div>
                     </div>
                   </div>
                 </div>
@@ -553,8 +580,8 @@ function App() {
                       </svg>
                     </div>
                     <div>
-                      <div className="text-2xl font-bold text-dark">Fast Delivery</div>
-                      <div className="text-textMuted text-sm">Most jobs done in days, not weeks</div>
+                      <div className="text-2xl font-bold text-dark">{uiSettings.heroBadge3Title}</div>
+                      <div className="text-textMuted text-sm">{uiSettings.heroBadge3Subtitle}</div>
                     </div>
                   </div>
                 </div>
