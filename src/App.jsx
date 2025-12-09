@@ -457,7 +457,9 @@ function App() {
       {/* Logo Bar */}
       <div className="bg-white rounded-2xl shadow-lg mb-8 px-8 py-4">
         <div className="flex justify-between items-center">
-          <img src={uiSettings.logoUrl} alt="Logo" className="h-8 lg:h-10" />
+          <a href="https://goenvy.io" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
+            <img src={uiSettings.logoUrl} alt="Logo" className="h-8 lg:h-10" />
+          </a>
           <div className="flex items-center gap-4">
             <img src={uiSettings.badgeUrl} alt="Badge" className="h-12 lg:h-16" />
             {!isAdminAuthenticated ? (
