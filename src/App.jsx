@@ -583,19 +583,29 @@ function App() {
 
         {/* Core Pitch Section */}
         {currentView !== 'detail' && uiSettings.introText && (
-          <div className="max-w-4xl mx-auto mb-12 text-center px-4">
-            <div className="glass-panel rounded-2xl p-8 lg:p-10 relative overflow-hidden group hover:shadow-[0_0_30px_rgba(0,255,194,0.15)] transition-all duration-500 border-primary/20">
+          <div className="max-w-6xl mx-auto mb-8 text-center px-4">
+            <div className="glass-panel rounded-xl p-4 lg:p-6 relative overflow-hidden group hover:shadow-[0_0_30px_rgba(0,255,194,0.15)] transition-all duration-500 border-primary/20 mb-6">
               <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-secondary/5 opacity-50 group-hover:opacity-100 transition-opacity duration-500"></div>
-              <p className="text-xl lg:text-2xl text-dark leading-relaxed font-light relative z-10 font-heading">
-                {uiSettings.introText}
+              <p className="text-lg lg:text-xl text-dark leading-relaxed font-light relative z-10 font-heading">
+                {uiSettings.introText.length > 300 ? `${uiSettings.introText.slice(0, 300)}...` : uiSettings.introText}
               </p>
             </div>
+
+            <button
+              onClick={() => document.getElementById('catalog-section')?.scrollIntoView({ behavior: 'smooth' })}
+              className="flex flex-col items-center mx-auto text-textMuted hover:text-primary transition-colors group cursor-pointer animate-bounce"
+            >
+              <span className="text-sm font-medium uppercase tracking-widest opacity-70 group-hover:opacity-100">Scroll down to see our jobs catalog</span>
+              <svg className="w-5 h-5 mt-2 group-hover:translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+              </svg>
+            </button>
           </div>
         )}
 
         {/* Navigation Tabs - Hide on detail view */}
         {currentView !== 'detail' && (
-          <div className="flex justify-center gap-2 flex-wrap">
+          <div id="catalog-section" className="flex justify-center gap-2 flex-wrap scroll-mt-24">
             <button
               onClick={() => setCurrentView('catalog')}
               className={`
