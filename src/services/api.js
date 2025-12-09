@@ -10,6 +10,7 @@ import { supabase } from '../lib/supabase';
 const mapServiceFromDb = (s) => ({
     ...s,
     youtubeVideoId: s.youtube_video_id,
+    colorTheme: s.color_theme || 'primary',
 });
 
 export const api = {
@@ -39,9 +40,11 @@ export const api = {
         const dbPayload = {
             ...service,
             youtube_video_id: service.youtubeVideoId,
+            color_theme: service.colorTheme,
         };
         // Remove camelCase keys that aren't in DB (optional, but cleaner)
         delete dbPayload.youtubeVideoId;
+        delete dbPayload.colorTheme;
         delete dbPayload.uniqueId; // client-side only
 
         const { data, error } = await supabase
@@ -58,8 +61,10 @@ export const api = {
         const dbPayload = {
             ...updates,
             youtube_video_id: updates.youtubeVideoId,
+            color_theme: updates.colorTheme,
         };
         delete dbPayload.youtubeVideoId;
+        delete dbPayload.colorTheme;
         delete dbPayload.uniqueId;
 
         const { data, error } = await supabase

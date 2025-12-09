@@ -30,7 +30,8 @@ const AdminPanel = ({ services, bundles, onAdd, onEdit, onDelete, onReorder, onA
         timeline: '',
         deliverables: '',
         youtubeVideoId: '',
-        screenshots: []
+        screenshots: [],
+        colorTheme: 'primary' // Default to Pink
     });
 
     const [serviceForm, setServiceForm] = useState(getEmptyServiceForm());
@@ -106,7 +107,8 @@ const AdminPanel = ({ services, bundles, onAdd, onEdit, onDelete, onReorder, onA
                 timeline: item.timeline || '',
                 deliverables: Array.isArray(item.deliverables) ? item.deliverables.join(', ') : (item.deliverables || ''),
                 youtubeVideoId: item.youtubeVideoId || '',
-                screenshots: item.screenshots || []
+                screenshots: item.screenshots || [],
+                colorTheme: item.colorTheme || 'primary'
             });
             // Reset bundle form just in case
             setBundleForm(getEmptyBundleForm());
@@ -262,6 +264,37 @@ const AdminPanel = ({ services, bundles, onAdd, onEdit, onDelete, onReorder, onA
                                         className="w-full bg-gray-100 border border-gray-300 rounded-lg px-3 py-2 text-dark text-sm focus:border-primary focus:outline-none"
                                         placeholder="e.g. 2 weeks"
                                     />
+                                </div>
+                            </div>
+
+                            {/* Color Theme Selector */}
+                            <div>
+                                <label className="block text-xs text-textMuted mb-2">Card Color Theme</label>
+                                <div className="flex gap-3">
+                                    <button
+                                        type="button"
+                                        onClick={() => setServiceForm({ ...serviceForm, colorTheme: 'primary' })}
+                                        className={`flex-1 py-2 px-3 rounded-lg border flex items-center justify-center gap-2 transition-all ${serviceForm.colorTheme === 'primary' ? 'border-primary bg-primary/10 text-dark' : 'border-gray-300 text-textMuted hover:border-gray-400'}`}
+                                    >
+                                        <span className="w-3 h-3 rounded-full bg-primary/80"></span>
+                                        <span className="text-xs font-medium">Pink</span>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setServiceForm({ ...serviceForm, colorTheme: 'secondary' })}
+                                        className={`flex-1 py-2 px-3 rounded-lg border flex items-center justify-center gap-2 transition-all ${serviceForm.colorTheme === 'secondary' ? 'border-secondary bg-secondary/10 text-dark' : 'border-gray-300 text-textMuted hover:border-gray-400'}`}
+                                    >
+                                        <span className="w-3 h-3 rounded-full bg-secondary/80"></span>
+                                        <span className="text-xs font-medium">Teal</span>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setServiceForm({ ...serviceForm, colorTheme: 'accent' })}
+                                        className={`flex-1 py-2 px-3 rounded-lg border flex items-center justify-center gap-2 transition-all ${serviceForm.colorTheme === 'accent' ? 'border-accent bg-accent/10 text-dark' : 'border-gray-300 text-textMuted hover:border-gray-400'}`}
+                                    >
+                                        <span className="w-3 h-3 rounded-full bg-accent/80"></span>
+                                        <span className="text-xs font-medium">Lime</span>
+                                    </button>
                                 </div>
                             </div>
                             <div>

@@ -2,11 +2,24 @@ import React from 'react';
 import { IconInfo } from './Icons';
 
 const CatalogCard = ({ service, onViewDetails }) => {
-    // Rotate through Envy brand colors
-    const colors = ['#FF1F6C', '#50D2C1', '#D6FE51'];
-    const colorIndex = (service.id || 0) % colors.length;
-    const bgColor = colors[colorIndex];
-    const isDark = colorIndex === 0 || colorIndex === 1; // Pink and Teal are dark, Lime is light
+    // Determine colors based on service.colorTheme
+    // Fallback to random rotation if not set (for backward compatibility)
+    const getThemeColors = () => {
+        if (service.colorTheme === 'secondary') return { bg: '#50D2C1', isDark: true }; // Teal
+        if (service.colorTheme === 'accent') return { bg: '#D6FE51', isDark: false };    // Lime
+        if (service.colorTheme === 'primary') return { bg: '#FF1F6C', isDark: true };    // Pink
+
+        // Fallback: Rotate through Envy brand colors based on ID
+        const colors = ['#FF1F6C', '#50D2C1', '#D6FE51'];
+        const colorIndex = (service.id || 0) % colors.length;
+        const fallbackBg = colors[colorIndex];
+        return {
+            bg: fallbackBg,
+            isDark: colorIndex === 0 || colorIndex === 1
+        };
+    };
+
+    const { bg: bgColor, isDark } = getThemeColors();
     const textColor = isDark ? '#FFFFFF' : '#000000';
 
     return (
