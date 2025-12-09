@@ -580,6 +580,19 @@ function App() {
           </div>
         )}
 
+
+        {/* Core Pitch Section */}
+        {currentView !== 'detail' && uiSettings.introText && (
+          <div className="max-w-4xl mx-auto mb-12 text-center px-4">
+            <div className="glass-panel rounded-2xl p-8 lg:p-10 relative overflow-hidden group hover:shadow-[0_0_30px_rgba(0,255,194,0.15)] transition-all duration-500 border-primary/20">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-secondary/5 opacity-50 group-hover:opacity-100 transition-opacity duration-500"></div>
+              <p className="text-xl lg:text-2xl text-dark leading-relaxed font-light relative z-10 font-heading">
+                {uiSettings.introText}
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Navigation Tabs - Hide on detail view */}
         {currentView !== 'detail' && (
           <div className="flex justify-center gap-2 flex-wrap">
