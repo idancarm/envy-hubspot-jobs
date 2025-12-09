@@ -7,6 +7,7 @@ const AdminPanel = ({ services, bundles, onAdd, onEdit, onDelete, onReorder, onA
 
     const [activeTab, setActiveTab] = useState('services');
     const [editingId, setEditingId] = useState(null);
+    const [editingType, setEditingType] = useState(null); // 'service' or 'bundle'
 
     // Settings Form
     const [settingsForm, setSettingsForm] = useState(uiSettings || {});
@@ -20,11 +21,62 @@ const AdminPanel = ({ services, bundles, onAdd, onEdit, onDelete, onReorder, onA
         onUpdateSettings(settingsForm);
     };
 
-    // Service Form
-    const [serviceForm, setServiceForm] = useState({ name: '', description: '', price: '', details: '', timeline: '', deliverables: '', youtubeVideoId: '', screenshots: [] });
+    // Service Form - initialize with empty values
+    const getEmptyServiceForm = () => ({
+        name: '',
+        description: '',
+        price: '',
+        details: '',
+        timeline: '',
+        deliverables: '',
+        youtubeVideoId: '',
+        screenshots: []
+    });
+
+    const [serviceForm, setServiceForm] = useState(getEmptyServiceForm());
 
     // Bundle Form
-    const [bundleForm, setBundleForm] = useState({ name: '', description: '', discount: '', serviceIds: [] });
+    const getEmptyBundleForm = () => ({
+        name: '',
+        description: '',
+        discount: '',
+        serviceIds: []
+    });
+
+    const [bundleForm, setBundleForm] = useState(getEmptyBundleForm());
+
+    // Effect to populate form when editingId changes
+    useEffect(() => {
+        if (editingId === null) {
+            return;
+        }
+
+        if (editingType === 'service') {
+            const item = services.find(s => s.id === editingId);
+            if (item) {
+                setServiceForm({
+                    name: item.name || '',
+                    description: item.description || '',
+                    price: item.price || '',
+                    details: item.details || '',
+                    timeline: item.timeline || '',
+                    deliverables: Array.isArray(item.deliverables) ? item.deliverables.join(', ') : (item.deliverables || ''),
+                    youtubeVideoId: item.youtubeVideoId || '',
+                    screenshots: item.screenshots || []
+                });
+            }
+        } else if (editingType === 'bundle') {
+            const item = bundles.find(b => b.id === editingId);
+            if (item) {
+                setBundleForm({
+                    name: item.name || '',
+                    description: item.description || '',
+                    discount: item.discount || '',
+                    serviceIds: item.serviceIds || []
+                });
+            }
+        }
+    }, [editingId, editingType, services, bundles]);
 
     const handleServiceSubmit = (e) => {
         e.preventDefault();
@@ -70,32 +122,22 @@ const AdminPanel = ({ services, bundles, onAdd, onEdit, onDelete, onReorder, onA
     };
 
     const handleEditClick = (item, type) => {
-        setEditingId(item.id);
+        // First reset the forms to clear any stale data
         if (type === 'service') {
-            setServiceForm({
-                name: item.name,
-                description: item.description,
-                price: item.price,
-                details: item.details || '',
-                timeline: item.timeline || '',
-                deliverables: Array.isArray(item.deliverables) ? item.deliverables.join(', ') : (item.deliverables || ''),
-                youtubeVideoId: item.youtubeVideoId || '',
-                screenshots: item.screenshots || []
-            });
+            setServiceForm(getEmptyServiceForm());
         } else {
-            setBundleForm({
-                name: item.name,
-                description: item.description,
-                discount: item.discount,
-                serviceIds: item.serviceIds || []
-            });
+            setBundleForm(getEmptyBundleForm());
         }
+        // Then set the editing state - the useEffect will populate the form
+        setEditingType(type);
+        setEditingId(item.id);
     };
 
     const resetForms = () => {
         setEditingId(null);
-        setServiceForm({ name: '', description: '', price: '', details: '', timeline: '', deliverables: '', youtubeVideoId: '', screenshots: [] });
-        setBundleForm({ name: '', description: '', discount: '', serviceIds: [] });
+        setEditingType(null);
+        setServiceForm(getEmptyServiceForm());
+        setBundleForm(getEmptyBundleForm());
     };
 
     const toggleServiceInBundle = (serviceId) => {
@@ -200,7 +242,7 @@ const AdminPanel = ({ services, bundles, onAdd, onEdit, onDelete, onReorder, onA
                     </h3>
 
                     {activeTab === 'services' ? (
-                        <form onSubmit={handleServiceSubmit} className="space-y-4">
+                        <form key={`service-form-${editingId || 'new'}`} onSubmit={handleServiceSubmit} className="space-y-4">
                             <div>
                                 <label className="block text-xs text-textMuted mb-1">Name</label>
                                 <input
@@ -246,6 +288,7 @@ const AdminPanel = ({ services, bundles, onAdd, onEdit, onDelete, onReorder, onA
                                 <label className="block text-xs text-textMuted mb-1">Details (Full Overview)</label>
                                 <div className="bg-white rounded-lg text-dark">
                                     <ReactQuill
+                                        key={editingId || 'new'} // Force remount when editing different service
                                         theme="snow"
                                         value={serviceForm.details}
                                         onChange={value => setServiceForm({ ...serviceForm, details: value })}
@@ -450,6 +493,83 @@ const AdminPanel = ({ services, bundles, onAdd, onEdit, onDelete, onReorder, onA
                                     className="w-full bg-gray-100 border border-gray-300 rounded-lg px-3 py-2 text-dark text-sm focus:border-primary focus:outline-none"
                                 />
                             </div>
+
+                            {/* Trust Badges Settings */}
+                            <div className="border-t border-gray-200 pt-4 mt-4">
+                                <h4 className="text-sm font-semibold text-dark mb-3 flex items-center gap-2">
+                                    <span className="w-1 h-4 bg-primary rounded-full"></span>
+                                    Trust Badges
+                                </h4>
+                                <div className="space-y-3">
+
+                                    {/* Badge 1 */}
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label className="block text-xs text-textMuted mb-1">Badge 1 Title</label>
+                                            <input
+                                                type="text"
+                                                value={settingsForm.heroBadge1Title || ''}
+                                                onChange={e => setSettingsForm({ ...settingsForm, heroBadge1Title: e.target.value })}
+                                                className="w-full bg-gray-100 border border-gray-300 rounded-lg px-3 py-2 text-dark text-sm focus:border-primary focus:outline-none"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs text-textMuted mb-1">Badge 1 Subtitle</label>
+                                            <input
+                                                type="text"
+                                                value={settingsForm.heroBadge1Subtitle || ''}
+                                                onChange={e => setSettingsForm({ ...settingsForm, heroBadge1Subtitle: e.target.value })}
+                                                className="w-full bg-gray-100 border border-gray-300 rounded-lg px-3 py-2 text-dark text-sm focus:border-primary focus:outline-none"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Badge 2 */}
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label className="block text-xs text-textMuted mb-1">Badge 2 Title</label>
+                                            <input
+                                                type="text"
+                                                value={settingsForm.heroBadge2Title || ''}
+                                                onChange={e => setSettingsForm({ ...settingsForm, heroBadge2Title: e.target.value })}
+                                                className="w-full bg-gray-100 border border-gray-300 rounded-lg px-3 py-2 text-dark text-sm focus:border-primary focus:outline-none"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs text-textMuted mb-1">Badge 2 Subtitle</label>
+                                            <input
+                                                type="text"
+                                                value={settingsForm.heroBadge2Subtitle || ''}
+                                                onChange={e => setSettingsForm({ ...settingsForm, heroBadge2Subtitle: e.target.value })}
+                                                className="w-full bg-gray-100 border border-gray-300 rounded-lg px-3 py-2 text-dark text-sm focus:border-primary focus:outline-none"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Badge 3 */}
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label className="block text-xs text-textMuted mb-1">Badge 3 Title</label>
+                                            <input
+                                                type="text"
+                                                value={settingsForm.heroBadge3Title || ''}
+                                                onChange={e => setSettingsForm({ ...settingsForm, heroBadge3Title: e.target.value })}
+                                                className="w-full bg-gray-100 border border-gray-300 rounded-lg px-3 py-2 text-dark text-sm focus:border-primary focus:outline-none"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs text-textMuted mb-1">Badge 3 Subtitle</label>
+                                            <input
+                                                type="text"
+                                                value={settingsForm.heroBadge3Subtitle || ''}
+                                                onChange={e => setSettingsForm({ ...settingsForm, heroBadge3Subtitle: e.target.value })}
+                                                className="w-full bg-gray-100 border border-gray-300 rounded-lg px-3 py-2 text-dark text-sm focus:border-primary focus:outline-none"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <button type="submit" className="w-full bg-primary text-black font-bold py-2 rounded-lg hover:bg-secondary transition-colors text-sm">
                                 Save Settings
                             </button>

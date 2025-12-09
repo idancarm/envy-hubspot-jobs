@@ -30,7 +30,16 @@ create table if not exists ui_settings (
   intro_text text,
   checkout_button_text text,
   catalog_title text,
-  catalog_subtitle text
+  catalog_subtitle text,
+  -- Hero section fields
+  hero_headline text,
+  hero_subheadline text,
+  hero_badge1_title text,
+  hero_badge1_subtitle text,
+  hero_badge2_title text,
+  hero_badge2_subtitle text,
+  hero_badge3_title text,
+  hero_badge3_subtitle text
 );
 
 -- Insert default settings if not exists
