@@ -45,38 +45,8 @@ const AdminPanel = ({ services, bundles, onAdd, onEdit, onDelete, onReorder, onA
 
     const [bundleForm, setBundleForm] = useState(getEmptyBundleForm());
 
-    // Effect to populate form when editingId changes
-    useEffect(() => {
-        if (editingId === null) {
-            return;
-        }
-
-        if (editingType === 'service') {
-            const item = services.find(s => s.id === editingId);
-            if (item) {
-                setServiceForm({
-                    name: item.name || '',
-                    description: item.description || '',
-                    price: item.price || '',
-                    details: item.details || '',
-                    timeline: item.timeline || '',
-                    deliverables: Array.isArray(item.deliverables) ? item.deliverables.join(', ') : (item.deliverables || ''),
-                    youtubeVideoId: item.youtubeVideoId || '',
-                    screenshots: item.screenshots || []
-                });
-            }
-        } else if (editingType === 'bundle') {
-            const item = bundles.find(b => b.id === editingId);
-            if (item) {
-                setBundleForm({
-                    name: item.name || '',
-                    description: item.description || '',
-                    discount: item.discount || '',
-                    serviceIds: item.serviceIds || []
-                });
-            }
-        }
-    }, [editingId, editingType, services, bundles]);
+    // Removed useEffect for population to prevent race conditions and improve consistency.
+    // Data is now populated directly in handleEditClick.
 
     const handleServiceSubmit = (e) => {
         e.preventDefault();
@@ -122,15 +92,34 @@ const AdminPanel = ({ services, bundles, onAdd, onEdit, onDelete, onReorder, onA
     };
 
     const handleEditClick = (item, type) => {
-        // First reset the forms to clear any stale data
-        if (type === 'service') {
-            setServiceForm(getEmptyServiceForm());
-        } else {
-            setBundleForm(getEmptyBundleForm());
-        }
-        // Then set the editing state - the useEffect will populate the form
+        // Set editing state
         setEditingType(type);
         setEditingId(item.id);
+
+        // Populate form directly
+        if (type === 'service') {
+            setServiceForm({
+                name: item.name || '',
+                description: item.description || '',
+                price: item.price || '',
+                details: item.details || '', // ReactQuill will pick this up
+                timeline: item.timeline || '',
+                deliverables: Array.isArray(item.deliverables) ? item.deliverables.join(', ') : (item.deliverables || ''),
+                youtubeVideoId: item.youtubeVideoId || '',
+                screenshots: item.screenshots || []
+            });
+            // Reset bundle form just in case
+            setBundleForm(getEmptyBundleForm());
+        } else {
+            setBundleForm({
+                name: item.name || '',
+                description: item.description || '',
+                discount: item.discount || '',
+                serviceIds: item.serviceIds || []
+            });
+            // Reset service form just in case
+            setServiceForm(getEmptyServiceForm());
+        }
     };
 
     const resetForms = () => {
