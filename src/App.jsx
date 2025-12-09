@@ -529,10 +529,9 @@ function App() {
                 )}
               </div>
 
-              {/* Right Column - Stats Badges */}
               <div className="flex flex-col gap-5">
-                {/* Stat Badge 1 */}
-                <div className="bg-gradient-to-r from-primary/10 to-secondary/10 backdrop-blur-sm rounded-xl p-5 border border-primary/20 hover:border-primary/40 transition-all hover:shadow-lg group">
+                {/* Stat Badge 1 - Primary (Pink) */}
+                <div className="bg-gradient-to-r from-primary/10 to-primary/5 backdrop-blur-sm rounded-xl p-5 border border-primary/20 hover:border-primary/40 transition-all hover:shadow-lg group">
                   <div className="flex items-center gap-4">
                     <div className="w-14 h-14 rounded-xl bg-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform">
                       <svg className="w-7 h-7 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -546,8 +545,8 @@ function App() {
                   </div>
                 </div>
 
-                {/* Stat Badge 2 */}
-                <div className="bg-gradient-to-r from-secondary/10 to-accent/10 backdrop-blur-sm rounded-xl p-5 border border-secondary/20 hover:border-secondary/40 transition-all hover:shadow-lg group">
+                {/* Stat Badge 2 - Secondary (Teal) */}
+                <div className="bg-gradient-to-r from-secondary/10 to-secondary/5 backdrop-blur-sm rounded-xl p-5 border border-secondary/20 hover:border-secondary/40 transition-all hover:shadow-lg group">
                   <div className="flex items-center gap-4">
                     <div className="w-14 h-14 rounded-xl bg-secondary/20 flex items-center justify-center group-hover:scale-110 transition-transform">
                       <svg className="w-7 h-7 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -561,11 +560,11 @@ function App() {
                   </div>
                 </div>
 
-                {/* Stat Badge 3 */}
-                <div className="bg-gradient-to-r from-accent/10 to-primary/10 backdrop-blur-sm rounded-xl p-5 border border-accent/30 hover:border-accent/50 transition-all hover:shadow-lg group">
+                {/* Stat Badge 3 - Accent (Lime) */}
+                <div className="bg-gradient-to-r from-accent/10 to-accent/5 backdrop-blur-sm rounded-xl p-5 border border-accent/20 hover:border-accent/40 transition-all hover:shadow-lg group">
                   <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-xl bg-accent/30 flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <svg className="w-7 h-7 text-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-14 h-14 rounded-xl bg-accent/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <svg className="w-7 h-7 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                       </svg>
                     </div>
