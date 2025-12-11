@@ -59,7 +59,7 @@ const JobDetailPage = ({ job, onBack, onAddToCart }) => {
                         <div>
                             <h3 className="text-2xl lg:text-3xl font-semibold text-dark mb-6 flex items-center gap-3">
                                 <span className="w-2 h-10 bg-primary rounded-full"></span>
-                                What We'll Do
+                                Key Benefits
                             </h3>
                             <div
                                 className="text-gray-700 leading-relaxed text-lg lg:text-xl prose prose-lg max-w-none"
@@ -178,7 +178,7 @@ const JobDetailPage = ({ job, onBack, onAddToCart }) => {
                             <svg className="w-5 h-5 lg:w-6 lg:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path>
                             </svg>
-                            Add to Cart
+                            Select This Job
                         </button>
                     )}
                 </div>

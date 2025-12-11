@@ -533,46 +533,46 @@ function App() {
 
               <div className="flex flex-col gap-5">
                 {/* Stat Badge 1 - Primary (Pink) */}
-                <div className="bg-gradient-to-r from-primary/10 to-primary/5 backdrop-blur-sm rounded-xl p-5 border border-primary/20 hover:border-primary/40 transition-all hover:shadow-lg group">
+                <div className="rounded-xl p-5 border-2 border-white/30 hover:border-white/50 transition-all hover:shadow-lg group" style={{ backgroundColor: '#FF1F6C' }}>
                   <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-xl bg-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <svg className="w-7 h-7 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
                       </svg>
                     </div>
                     <div>
-                      <div className="text-2xl font-bold text-dark">{uiSettings.heroBadge1Title}</div>
-                      <div className="text-textMuted text-sm">{uiSettings.heroBadge1Subtitle}</div>
+                      <div className="text-2xl font-bold text-white">{uiSettings.heroBadge1Title}</div>
+                      <div className="text-white/80 text-sm">{uiSettings.heroBadge1Subtitle}</div>
                     </div>
                   </div>
                 </div>
 
                 {/* Stat Badge 2 - Secondary (Teal) */}
-                <div className="bg-gradient-to-r from-secondary/10 to-secondary/5 backdrop-blur-sm rounded-xl p-5 border border-secondary/20 hover:border-secondary/40 transition-all hover:shadow-lg group">
+                <div className="rounded-xl p-5 border-2 border-white/30 hover:border-white/50 transition-all hover:shadow-lg group" style={{ backgroundColor: '#50D2C1' }}>
                   <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-xl bg-secondary/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <svg className="w-7 h-7 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
                       </svg>
                     </div>
                     <div>
-                      <div className="text-2xl font-bold text-dark">{uiSettings.heroBadge2Title}</div>
-                      <div className="text-textMuted text-sm">{uiSettings.heroBadge2Subtitle}</div>
+                      <div className="text-2xl font-bold text-white">{uiSettings.heroBadge2Title}</div>
+                      <div className="text-white/80 text-sm">{uiSettings.heroBadge2Subtitle}</div>
                     </div>
                   </div>
                 </div>
 
                 {/* Stat Badge 3 - Accent (Lime) */}
-                <div className="bg-gradient-to-r from-accent/10 to-accent/5 backdrop-blur-sm rounded-xl p-5 border border-accent/20 hover:border-accent/40 transition-all hover:shadow-lg group">
+                <div className="rounded-xl p-5 border-2 border-black/10 hover:border-black/20 transition-all hover:shadow-lg group" style={{ backgroundColor: '#D6FE51' }}>
                   <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-xl bg-accent/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <svg className="w-7 h-7 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-14 h-14 rounded-xl bg-black/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <svg className="w-7 h-7 text-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                       </svg>
                     </div>
                     <div>
                       <div className="text-2xl font-bold text-dark">{uiSettings.heroBadge3Title}</div>
-                      <div className="text-textMuted text-sm">{uiSettings.heroBadge3Subtitle}</div>
+                      <div className="text-dark/70 text-sm">{uiSettings.heroBadge3Subtitle}</div>
                     </div>
                   </div>
                 </div>
@@ -629,7 +629,7 @@ function App() {
                         `}
             >
               <IconCalculator />
-              <span>Checkout</span>
+              <span>Job Selector</span>
             </button>
             {isAdminAuthenticated && (
               <button
