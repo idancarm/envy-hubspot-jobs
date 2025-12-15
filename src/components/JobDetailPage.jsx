@@ -66,26 +66,6 @@ const JobDetailPage = ({ job, onBack, onAddToCart }) => {
                                 dangerouslySetInnerHTML={{ __html: job.details || job.description }}
                             />
                         </div>
-
-                        <div>
-                            <h3 className="text-2xl lg:text-3xl font-semibold text-dark mb-6 flex items-center gap-3">
-                                <span className="w-2 h-10 bg-primary rounded-full"></span>
-                                Deliverables
-                            </h3>
-                            <ul className="space-y-4">
-                                {(job.deliverables || []).map((item, idx) => (
-                                    <li key={idx} className="flex items-start gap-4 p-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors border border-gray-200">
-                                        <div className="p-1.5 rounded-full bg-dark text-white mt-0.5 flex-shrink-0">
-                                            <IconCheck />
-                                        </div>
-                                        <span className="text-gray-700 text-base lg:text-lg">{item}</span>
-                                    </li>
-                                ))}
-                                {(!job.deliverables || job.deliverables.length === 0) && (
-                                    <li className="text-gray-600 italic">No specific deliverables listed.</li>
-                                )}
-                            </ul>
-                        </div>
                     </div>
 
                     {/* Right Column - Video */}
@@ -115,7 +95,7 @@ const JobDetailPage = ({ job, onBack, onAddToCart }) => {
                             <ol className="space-y-5">
                                 <li className="flex gap-4">
                                     <span className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-white text-base font-bold flex items-center justify-center shadow-sm">1</span>
-                                    <span className="text-gray-700 text-base lg:text-lg">Add to cart and submit your request</span>
+                                    <span className="text-gray-700 text-base lg:text-lg">Select your Jobs and submit your request</span>
                                 </li>
                                 <li className="flex gap-4">
                                     <span className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-white text-base font-bold flex items-center justify-center shadow-sm">2</span>
