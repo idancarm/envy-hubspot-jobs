@@ -382,12 +382,47 @@ function App() {
     return cartItems.reduce((sum, item) => sum + item.price, 0);
   }, [cartItems]);
 
+  // History API Integration
+  useEffect(() => {
+    // Handle initial load or refresh
+    const handlePopState = (event) => {
+      // If state exists, restore it
+      if (event.state) {
+        if (event.state.view) {
+          setCurrentView(event.state.view);
+        }
+        if (event.state.job) {
+          setSelectedJob(event.state.job);
+        } else {
+          setSelectedJob(null);
+        }
+      } else {
+        // Default to catalog if no state (e.g. init)
+        setCurrentView('catalog');
+        setSelectedJob(null);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+
+    // Set initial state if null
+    if (!window.history.state) {
+      window.history.replaceState({ view: 'catalog', job: null }, '');
+    }
+
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []); // Run once on mount
+
   const handleCheckoutInitiate = () => {
     if (cartItems.length === 0) {
       alert("Your cart is empty.");
       return;
     }
     setIsCheckoutModalOpen(true);
+    // Modal doesn't necessarily need a history state unless we want that behavior, 
+    // but usually modals are overlay. If we want "Back" to close modal, that's deeper logic.
+    // For now, let's keep modal separate from main view routing or add a simple state?
+    // User requested "Browser back button takes user out", referring to main pages likely.
   };
 
   const handleModalSubmit = async (formData) => {
@@ -419,7 +454,9 @@ function App() {
       alert(`Thank you, ${firstName}! Your request has been received.\n\nWe have sent a confirmation to ${email}.`);
 
       setCartItems([]); // Clear the cart
-      setCurrentView('catalog'); // Return to catalog
+      // Return to catalog
+      setCurrentView('catalog');
+      window.history.pushState({ view: 'catalog', job: null }, '', '#catalog');
 
     } catch (err) {
       console.error("Checkout validation failed:", err);
@@ -436,11 +473,20 @@ function App() {
   const handleViewDetails = (job) => {
     setSelectedJob(job);
     setCurrentView('detail');
+    window.history.pushState({ view: 'detail', job: job }, '', `#job-${job.id}`);
+    window.scrollTo(0, 0);
   };
 
   const handleBackToCatalog = () => {
+    // If we have history to go back to, use back(), otherwise pushState
+    // But simple "Back" button UI usually implies "Up a level"
+    // Using history.back() is better for browser consistency if user came from there
+    // BUT user might have landed directly or want to clear detail state. 
+    // Safest for "Back to Catalog" button is explicit navigation.
+
     setSelectedJob(null);
     setCurrentView('catalog');
+    window.history.pushState({ view: 'catalog', job: null }, '', '#catalog');
   };
 
   const handleAddToCartFromDetail = (job) => {
@@ -608,7 +654,10 @@ function App() {
         {currentView !== 'detail' && (
           <div id="catalog-section" className="flex justify-center gap-2 flex-wrap scroll-mt-24">
             <button
-              onClick={() => setCurrentView('catalog')}
+              onClick={() => {
+                setCurrentView('catalog');
+                window.history.pushState({ view: 'catalog', job: null }, '', '#catalog');
+              }}
               className={`
                             flex items-center gap-2 px-6 py-3 rounded-full border transition-all font-medium
                             ${currentView === 'catalog'
@@ -620,7 +669,10 @@ function App() {
               <span>Catalog</span>
             </button>
             <button
-              onClick={() => setCurrentView('checkout')}
+              onClick={() => {
+                setCurrentView('checkout');
+                window.history.pushState({ view: 'checkout', job: null }, '', '#checkout');
+              }}
               className={`
                             flex items-center gap-2 px-6 py-3 rounded-full border transition-all font-medium
                             ${currentView === 'checkout'
@@ -633,7 +685,10 @@ function App() {
             </button>
             {isAdminAuthenticated && (
               <button
-                onClick={() => setCurrentView('admin')}
+                onClick={() => {
+                  setCurrentView('admin');
+                  window.history.pushState({ view: 'admin', job: null }, '', '#admin');
+                }}
                 className={`
                                 flex items-center gap-2 px-6 py-3 rounded-full border transition-all font-medium
                                 ${currentView === 'admin'

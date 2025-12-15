@@ -13,16 +13,21 @@ const JobDetailPage = ({ job, onBack, onAddToCart }) => {
     return (
         <div className="animate-fadeIn">
             {/* Back Button */}
-            <div className="mb-6">
-                <button
-                    onClick={onBack}
-                    className="flex items-center gap-2 text-textMuted hover:text-primary transition-colors group"
-                >
-                    <svg className="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path>
-                    </svg>
-                    <span className="font-medium">Back to Catalog</span>
-                </button>
+            {/* Sticky Header with Back Button */}
+            <div className="sticky top-0 z-50 bg-[#F3F4F6]/95 backdrop-blur-md py-4 -mx-4 px-4 lg:-mx-8 lg:px-8 mb-6 border-b border-gray-200/50 shadow-sm transition-all">
+                <div className="flex items-center justify-between">
+                    <button
+                        onClick={onBack}
+                        className="flex items-center gap-2 text-textMuted hover:text-primary transition-colors group"
+                    >
+                        <svg className="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                        <span className="font-medium">Back to Catalog</span>
+                    </button>
+
+                    {/* Optional: Show mini-title or CTA on scroll could go here, keeping it simple for now */}
+                </div>
             </div>
 
             {/* Header Section */}
@@ -162,6 +167,19 @@ const JobDetailPage = ({ job, onBack, onAddToCart }) => {
                         </button>
                     )}
                 </div>
+            </div>
+
+            {/* Bottom Navigation */}
+            <div className="mt-12 text-center pb-8">
+                <button
+                    onClick={onBack}
+                    className="inline-flex items-center gap-2 text-textMuted hover:text-primary transition-colors px-6 py-3 rounded-full hover:bg-white/50"
+                >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                    <span className="font-medium">Back to Catalog</span>
+                </button>
             </div>
         </div>
     );
