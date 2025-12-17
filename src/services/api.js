@@ -11,6 +11,8 @@ const mapServiceFromDb = (s) => ({
     ...s,
     youtubeVideoId: s.youtube_video_id,
     colorTheme: s.color_theme || 'primary',
+    pricingModel: s.pricing_model || 'fixed',
+    monthlyPrice: s.monthly_price || 0,
 });
 
 export const api = {
@@ -41,10 +43,14 @@ export const api = {
             ...service,
             youtube_video_id: service.youtubeVideoId,
             color_theme: service.colorTheme,
+            pricing_model: service.pricingModel,
+            monthly_price: service.monthlyPrice,
         };
         // Remove camelCase keys that aren't in DB (optional, but cleaner)
         delete dbPayload.youtubeVideoId;
         delete dbPayload.colorTheme;
+        delete dbPayload.pricingModel;
+        delete dbPayload.monthlyPrice;
         delete dbPayload.uniqueId; // client-side only
 
         const { data, error } = await supabase
@@ -62,9 +68,13 @@ export const api = {
             ...updates,
             youtube_video_id: updates.youtubeVideoId,
             color_theme: updates.colorTheme,
+            pricing_model: updates.pricingModel,
+            monthly_price: updates.monthlyPrice,
         };
         delete dbPayload.youtubeVideoId;
         delete dbPayload.colorTheme;
+        delete dbPayload.pricingModel;
+        delete dbPayload.monthlyPrice;
         delete dbPayload.uniqueId;
 
         const { data, error } = await supabase

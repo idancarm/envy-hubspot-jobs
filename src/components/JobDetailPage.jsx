@@ -51,7 +51,15 @@ const JobDetailPage = ({ job, onBack, onAddToCart }) => {
                     </div>
                     <div className="text-right flex-shrink-0">
                         <div className="text-sm text-gray-600 mb-1">Investment</div>
-                        <div className="text-4xl lg:text-5xl font-bold text-primary">${(job.price || 0).toLocaleString()}</div>
+                        <div className="text-4xl lg:text-5xl font-bold text-primary">
+                            {job.pricingModel === 'variable' ? 'From ' : ''}
+                            ${(job.price || 0).toLocaleString()}
+                        </div>
+                        {job.pricingModel === 'hybrid' && (
+                            <div className="text-sm text-textMuted mt-1 font-medium">
+                                + ${job.monthlyPrice}/mo
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -147,7 +155,15 @@ const JobDetailPage = ({ job, onBack, onAddToCart }) => {
                     <div className="flex flex-wrap items-center gap-6 lg:gap-8">
                         <div>
                             <div className="text-sm text-gray-600 mb-1">Total Investment</div>
-                            <div className="text-2xl lg:text-3xl font-bold text-primary">${(job.price || 0).toLocaleString()}</div>
+                            <div className="text-2xl lg:text-3xl font-bold text-primary">
+                                {job.pricingModel === 'variable' ? 'From ' : ''}
+                                ${(job.price || 0).toLocaleString()}
+                            </div>
+                            {job.pricingModel === 'hybrid' && (
+                                <div className="text-sm text-gray-500 font-medium">
+                                    + ${job.monthlyPrice}/mo
+                                </div>
+                            )}
                         </div>
                         <div className="text-gray-400 hidden lg:block">•</div>
                         <div>

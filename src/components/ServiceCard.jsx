@@ -14,7 +14,14 @@ const ServiceCard = ({ service, onDragStart }) => {
             </div>
             <p className="text-sm text-textMuted leading-relaxed">{service.description}</p>
             <div className="mt-auto pt-4 flex justify-between items-center border-t border-slate-800">
-                <span className="text-primary font-bold tracking-wide text-lg">${service.price.toLocaleString()}</span>
+                <div className="flex flex-col">
+                    <span className="text-primary font-bold tracking-wide text-lg">
+                        {service.pricingModel === 'variable' ? 'From ' : ''}
+                        ${service.price.toLocaleString()}
+                        {service.pricingModel === 'hybrid' && <span className="text-sm font-normal text-textMuted"> + ${service.monthlyPrice}/mo</span>}
+                    </span>
+                    {service.pricingModel === 'hybrid' && <span className="text-[10px] text-textMuted uppercase">Setup + Monthly</span>}
+                </div>
                 <span className="text-xs font-medium text-gray-600 uppercase tracking-wider group-hover:text-primary transition-colors">Drag to add</span>
             </div>
         </div>

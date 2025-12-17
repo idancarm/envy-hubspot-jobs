@@ -29,7 +29,17 @@ const CatalogCard = ({ service, onViewDetails }) => {
         >
             <div className="flex justify-between items-start">
                 <h3 className="text-xl font-semibold font-heading" style={{ color: textColor }}>{service.name}</h3>
-                <span className="font-bold text-lg" style={{ color: textColor }}>${(service.price || 0).toLocaleString()}</span>
+                <div className="text-right">
+                    <div className="font-bold text-lg" style={{ color: textColor }}>
+                        {service.pricingModel === 'variable' ? 'From ' : ''}
+                        ${(service.price || 0).toLocaleString()}
+                    </div>
+                    {service.pricingModel === 'hybrid' && (
+                        <div className="text-xs opacity-90" style={{ color: textColor }}>
+                            + ${service.monthlyPrice}/mo
+                        </div>
+                    )}
+                </div>
             </div>
 
             <p className="text-sm leading-relaxed flex-1" style={{ color: textColor, opacity: 0.9 }}>{service.description}</p>
