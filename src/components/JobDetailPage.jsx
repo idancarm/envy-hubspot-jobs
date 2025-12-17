@@ -50,7 +50,7 @@ const JobDetailPage = ({ job, onBack, onAddToCart }) => {
                         </div>
                     </div>
                     <div className="text-right flex-shrink-0">
-                        <div className="text-sm text-gray-600 mb-1">Investment</div>
+                        <div className="text-sm text-gray-600 mb-1">Total Cost</div>
                         <div className="text-4xl lg:text-5xl font-bold text-primary">
                             {job.pricingModel === 'variable' ? 'From ' : ''}
                             ${(job.price || 0).toLocaleString()}
@@ -154,7 +154,11 @@ const JobDetailPage = ({ job, onBack, onAddToCart }) => {
                 <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
                     <div className="flex flex-wrap items-center gap-6 lg:gap-8">
                         <div>
-                            <div className="text-sm text-gray-600 mb-1">Total Investment</div>
+                            <div className="text-sm text-gray-600 mb-1">
+                                {job.pricingModel === 'fixed' ? 'Fixed Price' :
+                                    job.pricingModel === 'hybrid' ? 'Hybrid (Setup + Monthly)' :
+                                        'Variable Cost'}
+                            </div>
                             <div className="text-2xl lg:text-3xl font-bold text-primary">
                                 {job.pricingModel === 'variable' ? 'From ' : ''}
                                 ${(job.price || 0).toLocaleString()}
