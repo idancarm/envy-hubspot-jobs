@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { IconGrid, IconCalculator, IconSettings, IconDrag } from './components/Icons';
+import { IconGrid, IconCalculator, IconSettings, IconDrag, IconFAQ } from './components/Icons';
 import CatalogView from './components/CatalogView';
 import JobDetailPage from './components/JobDetailPage';
 import AdminPanel from './components/AdminPanel';
@@ -7,6 +7,7 @@ import ServiceCard from './components/ServiceCard';
 import BundleCard from './components/BundleCard';
 import CartItem from './components/CartItem';
 import CheckoutModal from './components/CheckoutModal';
+import FAQView from './components/FAQView';
 import { api } from './services/api';
 import { submitToHubSpot } from './services/hubspot';
 
@@ -683,6 +684,21 @@ function App() {
               <IconCalculator />
               <span>Job Selector</span>
             </button>
+            <button
+              onClick={() => {
+                setCurrentView('faq');
+                window.history.pushState({ view: 'faq', job: null }, '', '#faq');
+              }}
+              className={`
+                            flex items-center gap-2 px-6 py-3 rounded-full border transition-all font-medium
+                            ${currentView === 'faq'
+                  ? 'bg-primary text-black border-primary shadow-[0_0_20px_rgba(0,255,194,0.3)]'
+                  : 'bg-gray-100/50 text-textMuted border-gray-300 hover:border-slate-500 hover:text-gray-700'}
+                        `}
+            >
+              <IconFAQ />
+              <span>FAQ</span>
+            </button>
             {isAdminAuthenticated && (
               <button
                 onClick={() => {
@@ -719,6 +735,8 @@ function App() {
           onUpdateSettings={handleUpdateSettings}
           onClose={() => setCurrentView('catalog')}
         />
+      ) : currentView === 'faq' ? (
+        <FAQView />
       ) : currentView === 'catalog' ? (
         <CatalogView services={services} onViewDetails={handleViewDetails} uiSettings={uiSettings} />
       ) : currentView === 'detail' && selectedJob ? (
