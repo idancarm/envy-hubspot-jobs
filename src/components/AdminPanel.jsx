@@ -325,15 +325,7 @@ const AdminPanel = ({ services, bundles, onAdd, onEdit, onDelete, onReorder, onA
                                     />
                                 </div>
                             </div>
-                            <div>
-                                <label className="block text-xs text-textMuted mb-1">Deliverables (comma separated)</label>
-                                <textarea
-                                    value={serviceForm.deliverables}
-                                    onChange={e => setServiceForm({ ...serviceForm, deliverables: e.target.value })}
-                                    className="w-full bg-gray-100 border border-gray-300 rounded-lg px-3 py-2 text-dark text-sm focus:border-primary focus:outline-none resize-none h-20"
-                                    placeholder="Item 1, Item 2, Item 3"
-                                />
-                            </div>
+
                             <div>
                                 <label className="block text-xs text-textMuted mb-1">YouTube Video ID</label>
                                 <input
@@ -641,7 +633,11 @@ const AdminPanel = ({ services, bundles, onAdd, onEdit, onDelete, onReorder, onA
                                                     <button onClick={() => handleEditClick(service, 'service')} className="p-2 text-textMuted hover:text-primary hover:bg-primary/10 rounded-lg transition-colors">
                                                         <IconEdit />
                                                     </button>
-                                                    <button onClick={() => onDelete(service.id)} className="p-2 text-textMuted hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors">
+                                                    <button onClick={() => {
+                                                        if (window.confirm(`Are you sure you want to delete "${service.name}"?`)) {
+                                                            onDelete(service.id);
+                                                        }
+                                                    }} className="p-2 text-textMuted hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors">
                                                         <IconTrash />
                                                     </button>
                                                 </div>
@@ -665,7 +661,11 @@ const AdminPanel = ({ services, bundles, onAdd, onEdit, onDelete, onReorder, onA
                                                     <button onClick={() => handleEditClick(bundle, 'bundle')} className="p-2 text-textMuted hover:text-primary hover:bg-primary/10 rounded-lg transition-colors">
                                                         <IconEdit />
                                                     </button>
-                                                    <button onClick={() => onDeleteBundle(bundle.id)} className="p-2 text-textMuted hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors">
+                                                    <button onClick={() => {
+                                                        if (window.confirm(`Are you sure you want to delete "${bundle.name}"?`)) {
+                                                            onDeleteBundle(bundle.id);
+                                                        }
+                                                    }} className="p-2 text-textMuted hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors">
                                                         <IconTrash />
                                                     </button>
                                                 </div>
