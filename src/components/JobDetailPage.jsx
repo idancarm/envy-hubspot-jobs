@@ -100,7 +100,7 @@ const JobDetailPage = ({ job, onBack, onAddToCart }) => {
                             <ol className="space-y-5">
                                 <li className="flex gap-4">
                                     <span className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-white text-base font-bold flex items-center justify-center shadow-sm">1</span>
-                                    <span className="text-gray-700 text-base lg:text-lg">Select your job and submit your request</span>
+                                    <span className="text-gray-700 text-base lg:text-lg">Select this job and submit your request</span>
                                 </li>
                                 <li className="flex gap-4">
                                     <span className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-white text-base font-bold flex items-center justify-center shadow-sm">2</span>
