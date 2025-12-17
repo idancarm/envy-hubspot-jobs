@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { IconGrid, IconCalculator, IconSettings, IconDrag, IconFAQ } from './components/Icons';
 import CatalogView from './components/CatalogView';
 import JobDetailPage from './components/JobDetailPage';
@@ -509,6 +510,14 @@ function App() {
 
   return (
     <div className="container mx-auto px-4 py-8 lg:py-16 max-w-7xl min-h-screen flex flex-col">
+      <Helmet>
+        <title>{uiSettings.siteTitle} | {uiSettings.siteSubtitle}</title>
+        <meta name="description" content={uiSettings.introText} />
+        <meta property="og:title" content={`${uiSettings.siteTitle} | ${uiSettings.siteSubtitle}`} />
+        <meta property="og:description" content={uiSettings.introText} />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content={uiSettings.logoUrl} />
+      </Helmet>
       {/* Logo Bar */}
       <div className="bg-white rounded-2xl shadow-lg mb-8 px-8 py-4">
         <div className="flex justify-between items-center">
