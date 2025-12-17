@@ -488,6 +488,14 @@ function App() {
     setSelectedJob(null);
     setCurrentView('catalog');
     window.history.pushState({ view: 'catalog', job: null }, '', '#catalog');
+
+    // Scroll to catalog section after render
+    setTimeout(() => {
+      const element = document.getElementById('catalog-section');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 100);
   };
 
   const handleAddToCartFromDetail = (job) => {
