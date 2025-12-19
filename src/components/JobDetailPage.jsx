@@ -1,5 +1,6 @@
 import React from 'react';
 import { IconCheck } from './Icons';
+import { Helmet } from 'react-helmet-async';
 
 const JobDetailPage = ({ job, onBack, onAddToCart }) => {
     if (!job) return null;
@@ -12,6 +13,15 @@ const JobDetailPage = ({ job, onBack, onAddToCart }) => {
 
     return (
         <div className="animate-fadeIn">
+            <Helmet>
+                <title>{job.seoTitle || job.name} | Antigravity Services</title>
+                <meta name="description" content={job.seoDescription || job.description} />
+                <meta property="og:title" content={job.seoTitle || job.name} />
+                <meta property="og:description" content={job.seoDescription || job.description} />
+                <meta property="og:type" content="product" />
+                <meta property="og:price:amount" content={job.price} />
+                <meta property="og:price:currency" content="USD" />
+            </Helmet>
             {/* Back Button */}
             {/* Sticky Header with Back Button */}
             <div className="sticky top-0 z-50 bg-[#F3F4F6]/95 backdrop-blur-md py-4 -mx-4 px-4 lg:-mx-8 lg:px-8 mb-6 border-b border-gray-200/50 shadow-sm transition-all">

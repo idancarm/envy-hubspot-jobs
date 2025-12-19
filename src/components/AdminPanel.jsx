@@ -30,6 +30,9 @@ const AdminPanel = ({ services, bundles, onAdd, onEdit, onDelete, onReorder, onA
         timeline: '',
         deliverables: '',
         youtubeVideoId: '',
+        youtubeVideoId: '',
+        seoTitle: '',
+        seoDescription: '',
         screenshots: [],
         pricingModel: 'fixed', // 'fixed', 'hybrid', 'variable'
         monthlyPrice: 0,
@@ -109,7 +112,10 @@ const AdminPanel = ({ services, bundles, onAdd, onEdit, onDelete, onReorder, onA
                 details: item.details || '', // ReactQuill will pick this up
                 timeline: item.timeline || '',
                 deliverables: Array.isArray(item.deliverables) ? item.deliverables.join(', ') : (item.deliverables || ''),
+                deliverables: Array.isArray(item.deliverables) ? item.deliverables.join(', ') : (item.deliverables || ''),
                 youtubeVideoId: item.youtubeVideoId || '',
+                seoTitle: item.seoTitle || '',
+                seoDescription: item.seoDescription || '',
                 screenshots: item.screenshots || [],
                 screenshots: item.screenshots || [],
                 pricingModel: item.pricingModel || 'fixed',
@@ -361,6 +367,29 @@ const AdminPanel = ({ services, bundles, onAdd, onEdit, onDelete, onReorder, onA
                                                 ['clean']
                                             ]
                                         }}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="bg-white p-3 rounded-lg border border-gray-200 space-y-3 mb-4">
+                                <label className="block text-xs font-bold text-gray-700">SEO Settings</label>
+                                <div>
+                                    <label className="block text-xs text-textMuted mb-1">SEO Title (Meta Title)</label>
+                                    <input
+                                        type="text"
+                                        value={serviceForm.seoTitle || ''}
+                                        onChange={e => setServiceForm({ ...serviceForm, seoTitle: e.target.value })}
+                                        className="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-dark text-sm focus:border-primary focus:outline-none"
+                                        placeholder="Optimize for search engines"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs text-textMuted mb-1">SEO Description (Meta Description)</label>
+                                    <textarea
+                                        value={serviceForm.seoDescription || ''}
+                                        onChange={e => setServiceForm({ ...serviceForm, seoDescription: e.target.value })}
+                                        className="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-dark text-sm focus:border-primary focus:outline-none resize-none h-16"
+                                        placeholder="Brief summary for search results"
                                     />
                                 </div>
                             </div>
