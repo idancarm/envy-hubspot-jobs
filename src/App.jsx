@@ -755,7 +755,7 @@ function App() {
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-semibold text-dark flex items-center gap-3 font-heading">
                   <span className="w-1.5 h-8 bg-primary rounded-full shadow-[0_0_10px_#00FFC2]"></span>
-                  Build Your Package
+                  Discover Jobs
                 </h2>
                 <div className="flex bg-gray-100/50 rounded-lg p-1">
                   <button
