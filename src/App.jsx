@@ -750,7 +750,7 @@ function App() {
         <div className="flex flex-col lg:flex-row gap-8 relative flex-1">
 
           {/* Left Column: Service Selector */}
-          <div className="w-full lg:w-2/3">
+          <div className="w-full lg:w-[55%]">
             <div className="glass-panel rounded-2xl p-6 lg:p-8 h-full overflow-y-auto">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-semibold text-dark flex items-center gap-3 font-heading">
@@ -817,7 +817,7 @@ function App() {
           </div>
 
           {/* Right Column: Summary / Cart */}
-          <div className="w-full lg:w-1/3">
+          <div className="w-full lg:w-[45%]">
             <div
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
