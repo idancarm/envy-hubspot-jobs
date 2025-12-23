@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { IconGrid, IconCalculator, IconSettings, IconDrag, IconFAQ } from './components/Icons';
-import CatalogView from './components/CatalogView';
+import { IconGrid, IconSettings, IconDrag, IconFAQ } from './components/Icons';
+
 import JobDetailPage from './components/JobDetailPage';
 import AdminPanel from './components/AdminPanel';
 import ServiceCard from './components/ServiceCard';
@@ -678,28 +678,13 @@ function App() {
               }}
               className={`
                             flex items-center gap-2 px-6 py-3 rounded-full border transition-all font-medium
-                            ${currentView === 'catalog'
+                            ${currentView === 'catalog' || currentView === 'checkout'
                   ? 'bg-primary text-black border-primary shadow-[0_0_20px_rgba(0,255,194,0.3)]'
                   : 'bg-gray-100/50 text-textMuted border-gray-300 hover:border-slate-500 hover:text-gray-700'}
                         `}
             >
               <IconGrid />
-              <span>Catalog</span>
-            </button>
-            <button
-              onClick={() => {
-                setCurrentView('checkout');
-                window.history.pushState({ view: 'checkout', job: null }, '', '#checkout');
-              }}
-              className={`
-                            flex items-center gap-2 px-6 py-3 rounded-full border transition-all font-medium
-                            ${currentView === 'checkout'
-                  ? 'bg-primary text-black border-primary shadow-[0_0_20px_rgba(0,255,194,0.3)]'
-                  : 'bg-gray-100/50 text-textMuted border-gray-300 hover:border-slate-500 hover:text-gray-700'}
-                        `}
-            >
-              <IconCalculator />
-              <span>Job Selector</span>
+              <span>Jobs Catalog</span>
             </button>
             <button
               onClick={() => {
@@ -754,8 +739,7 @@ function App() {
         />
       ) : currentView === 'faq' ? (
         <FAQView />
-      ) : currentView === 'catalog' ? (
-        <CatalogView services={services} onViewDetails={handleViewDetails} uiSettings={uiSettings} />
+
       ) : currentView === 'detail' && selectedJob ? (
         <JobDetailPage
           job={selectedJob}
@@ -823,6 +807,7 @@ function App() {
                         key={service.id}
                         service={service}
                         onDragStart={handleDragStart}
+                        onViewDetails={handleViewDetails}
                       />
                     ))
                   )}
