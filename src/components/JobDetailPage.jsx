@@ -1,9 +1,36 @@
-import React from 'react';
-import { IconCheck } from './Icons';
+import React, { useEffect } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import { IconCheck } from './Icons';
 
-const JobDetailPage = ({ job, onBack, onAddToCart }) => {
-    if (!job) return null;
+const JobDetailPage = ({ services, onAddToCart }) => {
+    const { id } = useParams();
+    const navigate = useNavigate();
+
+    // Find job
+    // services might be empty initially if fetching, so check that? 
+    // But App renders Route, and App fetches data. 
+    // If deep linking, services might be empty on first render if loading.
+    // App handles loading state globally ("Loading..."). 
+    // So if we are here, services should be populated or empty array.
+
+    const job = services.find(s => s.id === parseInt(id));
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [id]);
+
+    if (!job) {
+        // If services are still loading in App (though App has isLoading check), this might flash.
+        // However, App returns "Loading..." if isLoading is true. 
+        // So if we are here, services are loaded. If job is missing, it's really missing.
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center">
+                <h2 className="text-2xl font-bold mb-4">Job Not Found</h2>
+                <Link to="/" className="text-primary hover:underline">Return to Catalog</Link>
+            </div>
+        );
+    }
 
     const handleAddToCart = () => {
         if (onAddToCart) {
@@ -12,7 +39,7 @@ const JobDetailPage = ({ job, onBack, onAddToCart }) => {
     };
 
     return (
-        <div className="animate-fadeIn">
+        <div className="animate-fadeIn container mx-auto px-4 py-8 lg:py-16 max-w-7xl">
             <Helmet>
                 <title>{job.seoTitle || job.name} | Antigravity Services</title>
                 <meta name="description" content={job.seoDescription || job.description} />
@@ -22,27 +49,26 @@ const JobDetailPage = ({ job, onBack, onAddToCart }) => {
                 <meta property="og:price:amount" content={job.price} />
                 <meta property="og:price:currency" content="USD" />
             </Helmet>
-            {/* Back Button */}
             {/* Sticky Header with Back Button */}
             <div className="sticky top-0 z-50 bg-[#F3F4F6]/95 backdrop-blur-md py-4 -mx-4 px-4 lg:-mx-8 lg:px-8 mb-6 border-b border-gray-200/50 shadow-sm transition-all">
-                <div className="flex items-center justify-between">
-                    <button
-                        onClick={onBack}
+                <div className="container mx-auto max-w-7xl flex items-center justify-between">
+                    <Link
+                        to="/"
                         className="flex items-center gap-2 text-textMuted hover:text-primary transition-colors group"
                     >
                         <svg className="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path>
                         </svg>
                         <span className="font-medium">Back to Catalog</span>
-                    </button>
+                    </Link>
 
-                    {/* Optional: Show mini-title or CTA on scroll could go here, keeping it simple for now */}
+                    {/* Optional: Show mini-title or CTA on scroll could go here */}
                 </div>
             </div>
 
             {/* Header Section */}
             <div className="glass-panel rounded-2xl p-8 mb-8">
-                <div className="flex items-start justify-between gap-8">
+                <div className="flex items-start justify-between gap-8 flex-col lg:flex-row">
                     <div className="flex-1">
                         <h1 className="text-4xl lg:text-5xl font-bold text-dark mb-4 font-heading leading-tight">{job.name}</h1>
                         <p className="text-textMuted text-lg lg:text-xl mb-6 leading-relaxed">{job.description}</p>
@@ -59,7 +85,7 @@ const JobDetailPage = ({ job, onBack, onAddToCart }) => {
                             </div>
                         </div>
                     </div>
-                    <div className="text-right flex-shrink-0">
+                    <div className="text-left lg:text-right flex-shrink-0">
                         <div className="text-sm text-gray-600 mb-1">Total Cost</div>
                         <div className="text-4xl lg:text-5xl font-bold text-primary">
                             {job.pricingModel === 'variable' ? 'From ' : ''}
@@ -201,15 +227,15 @@ const JobDetailPage = ({ job, onBack, onAddToCart }) => {
 
             {/* Bottom Navigation */}
             <div className="mt-12 text-center pb-8">
-                <button
-                    onClick={onBack}
+                <Link
+                    to="/"
                     className="inline-flex items-center gap-2 text-textMuted hover:text-primary transition-colors px-6 py-3 rounded-full hover:bg-white/50"
                 >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path>
                     </svg>
                     <span className="font-medium">Back to Catalog</span>
-                </button>
+                </Link>
             </div>
         </div>
     );

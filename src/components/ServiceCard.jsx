@@ -1,7 +1,8 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { IconDrag } from './Icons';
 
-const ServiceCard = ({ service, onDragStart, onViewDetails }) => {
+const ServiceCard = ({ service, onDragStart }) => {
     return (
         <div
             draggable
@@ -23,15 +24,12 @@ const ServiceCard = ({ service, onDragStart, onViewDetails }) => {
                     {service.pricingModel === 'hybrid' && <span className="text-[10px] text-textMuted uppercase">Setup + Monthly</span>}
                 </div>
                 <div className="flex items-center gap-3">
-                    <button
-                        onClick={(e) => {
-                            e.stopPropagation(); // Prevent drag start if clicked
-                            onViewDetails(service);
-                        }}
+                    <Link
+                        to={`/jobs/${service.id}`}
                         className="text-xs font-bold text-primary hover:text-white border border-primary/30 hover:bg-primary/10 px-3 py-1.5 rounded-lg transition-all"
                     >
                         Learn More
-                    </button>
+                    </Link>
                     <span className="text-xs font-medium text-gray-600 uppercase tracking-wider group-hover:text-primary transition-colors hidden sm:block">Drag to add</span>
                 </div>
             </div>

@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { IconGrid, IconSettings, IconDrag, IconFAQ } from './components/Icons';
+import { Routes, Route, useNavigate } from 'react-router-dom';
+import { IconSettings } from './components/Icons';
 
 import JobDetailPage from './components/JobDetailPage';
 import AdminPanel from './components/AdminPanel';
-import ServiceCard from './components/ServiceCard';
-import BundleCard from './components/BundleCard';
-import CartItem from './components/CartItem';
 import CheckoutModal from './components/CheckoutModal';
 import FAQView from './components/FAQView';
+import MainLayout from './components/MainLayout';
+import JobCatalogView from './components/JobCatalogView';
 import { api } from './services/api';
 import { submitToHubSpot } from './services/hubspot';
 
@@ -111,13 +111,11 @@ function App() {
   const [error, setError] = useState(null);
 
   const [cartItems, setCartItems] = useState([]);
-  const [isDraggingOver, setIsDraggingOver] = useState(false);
-  const [currentView, setCurrentView] = useState('catalog'); // 'checkout', 'catalog', 'admin', 'detail'
-  const [selectedJob, setSelectedJob] = useState(null); // For detail view
-  const [checkoutTab, setCheckoutTab] = useState('jobs'); // 'jobs', 'bundles'
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(() => {
     return localStorage.getItem('envy_admin_auth') === 'true';
   });
+
+  const navigate = useNavigate();
 
   // Fetch Data
   useEffect(() => {
@@ -190,7 +188,7 @@ function App() {
     const password = prompt('Enter admin password:');
     if (password === 'envy2024') { // Simple password check
       setIsAdminAuthenticated(true);
-      setCurrentView('admin');
+      navigate('/admin');
     } else if (password !== null) {
       alert('Incorrect password');
     }
@@ -198,7 +196,7 @@ function App() {
 
   const handleAdminLogout = () => {
     setIsAdminAuthenticated(false);
-    setCurrentView('catalog');
+    navigate('/');
   };
 
   // Admin Handlers
@@ -326,53 +324,11 @@ function App() {
     }
   };
 
-  // Drag & Drop Handlers
-  const handleDragStart = (e, item, isBundle = false) => {
-    if (isBundle) {
-      e.dataTransfer.setData("bundleId", item.id);
-    } else {
-      e.dataTransfer.setData("serviceId", item.id);
-    }
-    e.dataTransfer.effectAllowed = "copy";
-  };
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = "copy";
-    setIsDraggingOver(true);
-  };
-
-  const handleDragLeave = () => {
-    setIsDraggingOver(false);
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    setIsDraggingOver(false);
-
-    const serviceId = e.dataTransfer.getData("serviceId");
-    const bundleId = e.dataTransfer.getData("bundleId");
-
-    if (bundleId) {
-      const bundle = bundles.find(b => b.id === parseInt(bundleId, 10));
-      if (bundle) {
-        const newItem = { ...bundle, uniqueId: Date.now() + Math.random(), isBundle: true };
-        setCartItems(prev => [...prev, newItem]);
-      }
-    } else if (serviceId) {
-      const service = services.find(s => s.id === parseInt(serviceId, 10));
-      if (service) {
-        const newItem = { ...service, uniqueId: Date.now() + Math.random() };
-        setCartItems(prev => [...prev, newItem]);
-      }
-    }
-  };
-
   const handleAddItemToCart = (item) => {
     setCartItems(prev => [...prev, item]);
     // Optional: Navigate to checkout or show success message
     if (confirm(`Added ${item.name} to checkout. Go to checkout now?`)) {
-      setCurrentView('checkout');
+      navigate('/');
     }
   };
 
@@ -384,47 +340,12 @@ function App() {
     return cartItems.reduce((sum, item) => sum + item.price, 0);
   }, [cartItems]);
 
-  // History API Integration
-  useEffect(() => {
-    // Handle initial load or refresh
-    const handlePopState = (event) => {
-      // If state exists, restore it
-      if (event.state) {
-        if (event.state.view) {
-          setCurrentView(event.state.view);
-        }
-        if (event.state.job) {
-          setSelectedJob(event.state.job);
-        } else {
-          setSelectedJob(null);
-        }
-      } else {
-        // Default to catalog if no state (e.g. init)
-        setCurrentView('catalog');
-        setSelectedJob(null);
-      }
-    };
-
-    window.addEventListener('popstate', handlePopState);
-
-    // Set initial state if null
-    if (!window.history.state) {
-      window.history.replaceState({ view: 'catalog', job: null }, '');
-    }
-
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, []); // Run once on mount
-
   const handleCheckoutInitiate = () => {
     if (cartItems.length === 0) {
       alert("Your cart is empty.");
       return;
     }
     setIsCheckoutModalOpen(true);
-    // Modal doesn't necessarily need a history state unless we want that behavior, 
-    // but usually modals are overlay. If we want "Back" to close modal, that's deeper logic.
-    // For now, let's keep modal separate from main view routing or add a simple state?
-    // User requested "Browser back button takes user out", referring to main pages likely.
   };
 
   const handleModalSubmit = async (formData) => {
@@ -456,9 +377,7 @@ function App() {
       alert(`Thank you, ${firstName}! Your request has been received.\n\nWe have sent a confirmation to ${email}.`);
 
       setCartItems([]); // Clear the cart
-      // Return to catalog
-      setCurrentView('catalog');
-      window.history.pushState({ view: 'catalog', job: null }, '', '#catalog');
+      navigate('/');
 
     } catch (err) {
       console.error("Checkout validation failed:", err);
@@ -470,38 +389,6 @@ function App() {
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const handleViewDetails = (job) => {
-    setSelectedJob(job);
-    setCurrentView('detail');
-    window.history.pushState({ view: 'detail', job: job }, '', `#job-${job.id}`);
-    window.scrollTo(0, 0);
-  };
-
-  const handleBackToCatalog = () => {
-    // If we have history to go back to, use back(), otherwise pushState
-    // But simple "Back" button UI usually implies "Up a level"
-    // Using history.back() is better for browser consistency if user came from there
-    // BUT user might have landed directly or want to clear detail state. 
-    // Safest for "Back to Catalog" button is explicit navigation.
-
-    setSelectedJob(null);
-    setCurrentView('catalog');
-    window.history.pushState({ view: 'catalog', job: null }, '', '#catalog');
-
-    // Scroll to catalog section after render
-    setTimeout(() => {
-      const element = document.getElementById('catalog-section');
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
-      }
-    }, 100);
-  };
-
-  const handleAddToCartFromDetail = (job) => {
-    const newItem = { ...job, uniqueId: Date.now() + Math.random() };
-    handleAddItemToCart(newItem);
   };
 
   if (isLoading) {
@@ -565,304 +452,54 @@ function App() {
             {uiSettings.siteSubtitle}
           </p>
         </div>
-
-        {/* Intro Section - Video and Stats */}
-        {currentView !== 'detail' && (
-          <div className="glass-panel rounded-2xl p-8 lg:p-12 mb-8 max-w-6xl mx-auto overflow-hidden">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
-              {/* Left Column - Video */}
-              <div>
-                {uiSettings.introVideoId ? (
-                  <div className="rounded-2xl overflow-hidden shadow-2xl border border-gray-200 relative pt-[56.25%] bg-black">
-                    <iframe
-                      className="absolute inset-0 w-full h-full"
-                      src={`https://www.youtube.com/embed/${uiSettings.introVideoId}`}
-                      title="Introduction video"
-                      frameBorder="0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    ></iframe>
-                  </div>
-                ) : (
-                  <div className="rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50/50 relative pt-[56.25%]">
-                    <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
-                      <svg className="w-16 h-16 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                      </svg>
-                      <p className="text-sm">Add video in Admin Settings</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <div className="flex flex-col gap-5">
-                {/* Stat Badge 1 - Primary (Pink) */}
-                <div className="rounded-xl p-5 border-2 border-white/30 hover:border-white/50 transition-all hover:shadow-lg group" style={{ backgroundColor: '#FF1F6C' }}>
-                  <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
-                      </svg>
-                    </div>
-                    <div>
-                      <div className="text-2xl font-bold text-white">{uiSettings.heroBadge1Title}</div>
-                      <div className="text-white/80 text-sm">{uiSettings.heroBadge1Subtitle}</div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Stat Badge 2 - Secondary (Teal) */}
-                <div className="rounded-xl p-5 border-2 border-white/30 hover:border-white/50 transition-all hover:shadow-lg group" style={{ backgroundColor: '#50D2C1' }}>
-                  <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
-                      </svg>
-                    </div>
-                    <div>
-                      <div className="text-2xl font-bold text-white">{uiSettings.heroBadge2Title}</div>
-                      <div className="text-white/80 text-sm">{uiSettings.heroBadge2Subtitle}</div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Stat Badge 3 - Accent (Lime) */}
-                <div className="rounded-xl p-5 border-2 border-black/10 hover:border-black/20 transition-all hover:shadow-lg group" style={{ backgroundColor: '#D6FE51' }}>
-                  <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-xl bg-black/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <svg className="w-7 h-7 text-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                      </svg>
-                    </div>
-                    <div>
-                      <div className="text-2xl font-bold text-dark">{uiSettings.heroBadge3Title}</div>
-                      <div className="text-dark/70 text-sm">{uiSettings.heroBadge3Subtitle}</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-
-        {/* Core Pitch Section - Removed */}
-
-        {/* Navigation Tabs - Hide on detail view */}
-        {currentView !== 'detail' && (
-          <div id="catalog-section" className="flex justify-center gap-2 flex-wrap scroll-mt-24">
-            <button
-              onClick={() => {
-                setCurrentView('catalog');
-                window.history.pushState({ view: 'catalog', job: null }, '', '#catalog');
-              }}
-              className={`
-                            flex items-center gap-2 px-6 py-3 rounded-full border transition-all font-medium
-                            ${currentView === 'catalog' || currentView === 'checkout'
-                  ? 'bg-primary text-black border-primary shadow-[0_0_20px_rgba(0,255,194,0.3)]'
-                  : 'bg-gray-100/50 text-textMuted border-gray-300 hover:border-slate-500 hover:text-gray-700'}
-                        `}
-            >
-              <IconGrid />
-              <span>Jobs Catalog</span>
-            </button>
-            <button
-              onClick={() => {
-                setCurrentView('faq');
-                window.history.pushState({ view: 'faq', job: null }, '', '#faq');
-              }}
-              className={`
-                            flex items-center gap-2 px-6 py-3 rounded-full border transition-all font-medium
-                            ${currentView === 'faq'
-                  ? 'bg-primary text-black border-primary shadow-[0_0_20px_rgba(0,255,194,0.3)]'
-                  : 'bg-gray-100/50 text-textMuted border-gray-300 hover:border-slate-500 hover:text-gray-700'}
-                        `}
-            >
-              <IconFAQ />
-              <span>FAQ</span>
-            </button>
-            {isAdminAuthenticated && (
-              <button
-                onClick={() => {
-                  setCurrentView('admin');
-                  window.history.pushState({ view: 'admin', job: null }, '', '#admin');
-                }}
-                className={`
-                                flex items-center gap-2 px-6 py-3 rounded-full border transition-all font-medium
-                                ${currentView === 'admin'
-                    ? 'bg-primary text-black border-primary shadow-[0_0_20px_rgba(0,255,194,0.3)]'
-                    : 'bg-gray-100/50 text-textMuted border-gray-300 hover:border-slate-500 hover:text-gray-700'}
-                            `}
-              >
-                <IconSettings />
-                <span>Admin</span>
-              </button>
-            )}
-          </div>
-        )}
       </header>
 
-      {currentView === 'admin' ? (
-        <AdminPanel
-          services={services}
-          bundles={bundles}
-          onAdd={handleAddService}
-          onEdit={handleEditService}
-          onDelete={handleDeleteService}
-          onReorder={handleReorderServices}
-          onAddBundle={handleAddBundle}
-          onEditBundle={handleEditBundle}
-          onDeleteBundle={handleDeleteBundle}
-          uiSettings={uiSettings}
-          onUpdateSettings={handleUpdateSettings}
-          onClose={() => setCurrentView('catalog')}
-        />
-      ) : currentView === 'faq' ? (
-        <FAQView />
+      <Routes>
+        <Route element={
+          <MainLayout
+            uiSettings={uiSettings}
+            isAdminAuthenticated={isAdminAuthenticated}
+          />
+        }>
+          <Route path="/" element={
+            <JobCatalogView
+              services={services}
+              bundles={bundles}
+              cartItems={cartItems}
+              totalCost={totalCost}
+              onAddItem={handleAddItemToCart}
+              onRemoveItem={handleRemoveItem}
+              onCheckout={handleCheckoutInitiate}
+              uiSettings={uiSettings}
+              isSubmitting={isSubmitting}
+            />
+          } />
+          <Route path="/faq" element={<FAQView />} />
+          <Route path="/admin" element={
+            <AdminPanel
+              services={services}
+              bundles={bundles}
+              onAdd={handleAddService}
+              onEdit={handleEditService}
+              onDelete={handleDeleteService}
+              onReorder={handleReorderServices}
+              onAddBundle={handleAddBundle}
+              onEditBundle={handleEditBundle}
+              onDeleteBundle={handleDeleteBundle}
+              uiSettings={uiSettings}
+              onUpdateSettings={handleUpdateSettings}
+              onClose={() => navigate('/')}
+            />
+          } />
+        </Route>
+        <Route path="/jobs/:id" element={
+          <JobDetailPage
+            services={services}
+            onAddToCart={handleAddItemToCart}
+          />
+        } />
+      </Routes>
 
-      ) : currentView === 'detail' && selectedJob ? (
-        <JobDetailPage
-          job={selectedJob}
-          onBack={handleBackToCatalog}
-          onAddToCart={handleAddToCartFromDetail}
-        />
-      ) : (
-        <div className="flex flex-col lg:flex-row gap-8 relative flex-1">
-
-          {/* Left Column: Service Selector */}
-          <div className="w-full lg:w-[55%]">
-            <div className="glass-panel rounded-2xl p-6 lg:p-8 h-full overflow-y-auto">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-semibold text-dark flex items-center gap-3 font-heading">
-                  <span className="w-1.5 h-8 bg-primary rounded-full shadow-[0_0_10px_#00FFC2]"></span>
-                  Discover Jobs
-                </h2>
-                <div className="flex bg-gray-100/50 rounded-lg p-1">
-                  <button
-                    onClick={() => setCheckoutTab('jobs')}
-                    className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${checkoutTab === 'jobs' ? 'bg-primary text-black shadow-lg' : 'text-textMuted hover:text-dark'}`}
-                  >
-                    Jobs
-                  </button>
-                  <button
-                    onClick={() => setCheckoutTab('bundles')}
-                    className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${checkoutTab === 'bundles' ? 'bg-primary text-black shadow-lg' : 'text-textMuted hover:text-dark'}`}
-                  >
-                    Bundles
-                  </button>
-                </div>
-              </div>
-
-              <div className="mb-6 flex items-center gap-2 text-textMuted text-sm">
-                <IconDrag />
-                <span>Drag items to the right to build your stack</span>
-              </div>
-
-              {checkoutTab === 'bundles' ? (
-                <div className="grid grid-cols-1 gap-4 animate-fadeIn">
-                  {bundles.length > 0 ? (
-                    bundles.map(bundle => (
-                      <BundleCard
-                        key={bundle.id}
-                        bundle={bundle}
-                        services={services}
-                        onDragStart={handleDragStart}
-                      />
-                    ))
-                  ) : (
-                    <div className="text-center py-12 text-gray-600">
-                      No bundles available.
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 gap-4 animate-fadeIn">
-                  {services.length === 0 ? (
-                    <div className="text-center py-12 text-gray-600">
-                      No jobs available. Switch to Admin mode to add some.
-                    </div>
-                  ) : (
-                    services.map(service => (
-                      <ServiceCard
-                        key={service.id}
-                        service={service}
-                        onDragStart={handleDragStart}
-                        onViewDetails={handleViewDetails}
-                      />
-                    ))
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Right Column: Summary / Cart */}
-          <div className="w-full lg:w-[45%]">
-            <div
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-              className={`
-                                glass-panel rounded-2xl p-6 lg:p-8 h-full flex flex-col transition-all duration-300 border-2
-                                ${isDraggingOver
-                  ? 'border-primary bg-primary/5 shadow-[0_0_30px_rgba(0,255,194,0.1)]'
-                  : 'border-transparent hover:border-slate-800'}
-                            `}
-            >
-              <h2 className="text-2xl font-semibold text-dark mb-8 flex items-center gap-3 font-heading">
-                <span className="w-1.5 h-8 bg-white rounded-full"></span>
-                Your Scope
-              </h2>
-
-              <div className="flex-1 min-h-[200px] mb-8">
-                {cartItems.length === 0 ? (
-                  <div className="h-full flex flex-col items-center justify-center text-gray-500 border-2 border-dashed border-slate-800 rounded-xl p-10">
-                    <IconDrag />
-                    <p className="mt-4 text-sm font-medium">Drag jobs here to build your scope</p>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {cartItems.map(item => (
-                      <CartItem
-                        key={item.uniqueId}
-                        service={item}
-                        onRemove={handleRemoveItem}
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Footer / Totals */}
-              <div className="mt-auto pt-8 border-t border-gray-300">
-                <div className="flex justify-between items-end mb-8">
-                  <span className="text-textMuted font-medium">Estimated Total</span>
-                  <span className="text-4xl font-bold text-primary tracking-tight font-heading">
-                    ${totalCost.toLocaleString()}
-                  </span>
-                </div>
-
-                <button
-                  onClick={handleCheckoutInitiate}
-                  disabled={cartItems.length === 0}
-                  className={`
-                                        w-full py-4 rounded-xl font-bold text-lg shadow-lg transition-all duration-300 text-black
-                                        ${cartItems.length === 0 || isSubmitting
-                      ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                      : 'bg-primary hover:bg-secondary hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]'}
-                                    `}
-                >
-                  {uiSettings.checkoutButtonText || 'Request Consultation'}
-                </button>
-                <p className="text-center text-textMuted text-sm mt-4">
-                  No payment required now. We'll review your request and contact you to discuss details.
-                </p>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      )}
       <CheckoutModal
         isOpen={isCheckoutModalOpen}
         onClose={() => setIsCheckoutModalOpen(false)}

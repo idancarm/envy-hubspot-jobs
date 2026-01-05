@@ -1,0 +1,33 @@
+name: Run Redditor Agent
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'  # Run every 30 minutes
+  workflow_dispatch:        # Allow manual Trigger
+
+jobs:
+  run-agent:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r agent/requirements.txt
+
+    - name: Run Agent
+      env:
+        SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        # Encrypted JSON string of Reddit accounts credentials
+        REDDIT_ACCOUNTS_JSON: ${{ secrets.REDDIT_ACCOUNTS_JSON }} 
+      run: python agent/main.py
