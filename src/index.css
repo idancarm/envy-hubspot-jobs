@@ -27,13 +27,42 @@ body {
 }
 
 .glass-panel {
-  background: #FFFFFF;
-  border: 2px solid #DDDDDD;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
 }
 
 .neon-shadow {
-  box-shadow: 0 0 20px rgba(0, 255, 194, 0.15);
+  box-shadow: 0 0 20px rgba(0, 255, 194, 0.25);
+}
+
+/* Premium Animations */
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.gradient-blob {
+  position: absolute;
+  filter: blur(80px);
+  opacity: 0.4;
+  z-index: 0;
+  pointer-events: none;
 }
 
 /* Admin Table Styles */
@@ -92,11 +121,13 @@ body {
   margin-bottom: 1rem;
 }
 
-.prose strong, .prose b {
+.prose strong,
+.prose b {
   font-weight: 600;
 }
 
-.prose em, .prose i {
+.prose em,
+.prose i {
   font-style: italic;
 }
 
@@ -109,12 +140,18 @@ body {
   color: #50D2C1;
 }
 
-.prose h1, .prose h2, .prose h3, .prose h4 {
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4 {
   font-weight: 600;
   margin-top: 1.5rem;
   margin-bottom: 0.75rem;
 }
 
-.prose ul ul, .prose ol ol, .prose ul ol, .prose ol ul {
+.prose ul ul,
+.prose ol ol,
+.prose ul ol,
+.prose ol ul {
   margin: 0.5rem 0;
 }
