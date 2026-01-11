@@ -541,6 +541,16 @@ const AdminPanel = ({ services, bundles, onAdd, onEdit, onDelete, onReorder, onA
                                 />
                             </div>
                             <div>
+                                <label className="block text-xs text-textMuted mb-1">Social Share Image URL (OG Image)</label>
+                                <input
+                                    type="text"
+                                    value={settingsForm.ogImageUrl || ''}
+                                    onChange={e => setSettingsForm({ ...settingsForm, ogImageUrl: e.target.value })}
+                                    className="w-full bg-gray-100 border border-gray-300 rounded-lg px-3 py-2 text-dark text-sm focus:border-primary focus:outline-none"
+                                    placeholder="https://..."
+                                />
+                            </div>
+                            <div>
                                 <label className="block text-xs text-textMuted mb-1">Badge URL</label>
                                 <input
                                     type="text"

@@ -97,7 +97,9 @@ const DEFAULT_UI_SETTINGS = {
   heroBadge2Title: 'Fixed Scope',
   heroBadge2Subtitle: 'Clear deliverables, no surprises',
   heroBadge3Title: 'Fast Delivery',
-  heroBadge3Subtitle: 'Most jobs done in days, not weeks'
+  heroBadge3Title: 'Fast Delivery',
+  heroBadge3Subtitle: 'Most jobs done in days, not weeks',
+  ogImageUrl: '',
 };
 
 function App() {
@@ -159,7 +161,9 @@ function App() {
             heroBadge2Title: fetchedSettings.hero_badge2_title || fetchedSettings.heroBadge2Title || DEFAULT_UI_SETTINGS.heroBadge2Title,
             heroBadge2Subtitle: fetchedSettings.hero_badge2_subtitle || fetchedSettings.heroBadge2Subtitle || DEFAULT_UI_SETTINGS.heroBadge2Subtitle,
             heroBadge3Title: fetchedSettings.hero_badge3_title || fetchedSettings.heroBadge3Title || DEFAULT_UI_SETTINGS.heroBadge3Title,
+            heroBadge3Title: fetchedSettings.hero_badge3_title || fetchedSettings.heroBadge3Title || DEFAULT_UI_SETTINGS.heroBadge3Title,
             heroBadge3Subtitle: fetchedSettings.hero_badge3_subtitle || fetchedSettings.heroBadge3Subtitle || DEFAULT_UI_SETTINGS.heroBadge3Subtitle,
+            ogImageUrl: fetchedSettings.og_image_url || fetchedSettings.ogImageUrl || DEFAULT_UI_SETTINGS.ogImageUrl,
           };
           setUiSettings(mappedSettings);
         }
@@ -316,7 +320,10 @@ function App() {
         hero_badge2_title: newSettings.heroBadge2Title,
         hero_badge2_subtitle: newSettings.heroBadge2Subtitle,
         hero_badge3_title: newSettings.heroBadge3Title,
-        hero_badge3_subtitle: newSettings.heroBadge3Subtitle
+        hero_badge2_subtitle: newSettings.heroBadge2Subtitle,
+        hero_badge3_title: newSettings.heroBadge3Title,
+        hero_badge3_subtitle: newSettings.heroBadge3Subtitle,
+        og_image_url: newSettings.ogImageUrl
       };
       await api.updateSettings(dbSettings);
     } catch (err) {
@@ -403,7 +410,13 @@ function App() {
         <meta property="og:title" content={`${uiSettings.siteTitle} | ${uiSettings.siteSubtitle}`} />
         <meta property="og:description" content={uiSettings.introText} />
         <meta property="og:type" content="website" />
-        <meta property="og:image" content={uiSettings.logoUrl} />
+        <meta property="og:description" content={uiSettings.introText} />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content={uiSettings.ogImageUrl || uiSettings.logoUrl} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`${uiSettings.siteTitle} | ${uiSettings.siteSubtitle}`} />
+        <meta name="twitter:description" content={uiSettings.introText} />
+        <meta name="twitter:image" content={uiSettings.ogImageUrl || uiSettings.logoUrl} />
       </Helmet>
       {/* Logo Bar */}
       <div className="bg-white rounded-2xl shadow-lg mb-8 px-8 py-4">
