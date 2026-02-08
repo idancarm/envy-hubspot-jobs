@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { IconDrag } from './Icons';
+import { IconDrag, IconPlus } from './Icons';
 
-const ServiceCard = ({ service, onDragStart }) => {
+const ServiceCard = ({ service, onDragStart, onClickAdd }) => {
     return (
         <div
             draggable
@@ -30,7 +30,12 @@ const ServiceCard = ({ service, onDragStart }) => {
                     >
                         Learn More
                     </Link>
-                    <span className="text-xs font-medium text-gray-600 uppercase tracking-wider group-hover:text-primary transition-colors hidden sm:block">Drag to add</span>
+                    <button
+                        onClick={(e) => { e.stopPropagation(); onClickAdd(service); }}
+                        className="flex items-center gap-1 text-xs font-bold text-primary hover:text-white border border-primary/30 hover:bg-primary/10 px-3 py-1.5 rounded-lg transition-all"
+                    >
+                        <IconPlus /> Add
+                    </button>
                 </div>
             </div>
         </div>

@@ -1,7 +1,7 @@
 import React from 'react';
-import { IconDrag, IconCheck } from './Icons';
+import { IconDrag, IconCheck, IconPlus } from './Icons';
 
-const BundleCard = ({ bundle, services, onDragStart }) => {
+const BundleCard = ({ bundle, services, onDragStart, onClickAdd }) => {
     const includedServices = services.filter(s => bundle.serviceIds.includes(s.id));
     const originalPrice = includedServices.reduce((sum, s) => sum + s.price, 0);
 
@@ -35,7 +35,12 @@ const BundleCard = ({ bundle, services, onDragStart }) => {
                     <span className="text-gray-600 line-through text-sm">${originalPrice.toLocaleString()}</span>
                     <span className="text-primary font-bold tracking-wide text-xl ml-2">${bundle.price.toLocaleString()}</span>
                 </div>
-                <span className="text-xs font-medium text-primary uppercase tracking-wider group-hover:text-dark transition-colors">Drag to add</span>
+                <button
+                    onClick={(e) => { e.stopPropagation(); onClickAdd(bundle, true); }}
+                    className="flex items-center gap-1 text-xs font-bold text-primary hover:text-white border border-primary/30 hover:bg-primary/10 px-3 py-1.5 rounded-lg transition-all"
+                >
+                    <IconPlus /> Add
+                </button>
             </div>
         </div>
     );

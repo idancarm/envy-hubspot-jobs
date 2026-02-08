@@ -92,13 +92,12 @@ const DEFAULT_UI_SETTINGS = {
   // Hero section text
   heroHeadline: 'Your HubSpot Tune-Up Starts Here',
   heroSubheadline: 'Fixed-scope projects led by senior RevOps experts. No retainers, no fluff.',
-  heroBadge1Title: '100+ Portals',
-  heroBadge1Subtitle: 'Managed by our senior team',
-  heroBadge2Title: 'Fixed Scope',
-  heroBadge2Subtitle: 'Clear deliverables, no surprises',
-  heroBadge3Title: 'Fast Delivery',
-  heroBadge3Title: 'Fast Delivery',
-  heroBadge3Subtitle: 'Most jobs done in days, not weeks',
+  heroBadge1Title: 'HubSpot upgrades from Elite Partners',
+  heroBadge1Subtitle: 'We deploy HubSpot’s most valuable (and often underused) features, no vague retainer needed.',
+  heroBadge2Title: 'Designed to impact pipeline',
+  heroBadge2Subtitle: 'Every Job supports SQL growth, reduces lead leakage, and gets your team actually using the tools you’re already paying for.',
+  heroBadge3Title: 'Fast delivery',
+  heroBadge3Subtitle: 'We define exactly what gets done, then ship it fast, usually under weeks.',
   ogImageUrl: '',
 };
 
@@ -160,7 +159,6 @@ function App() {
             heroBadge1Subtitle: fetchedSettings.hero_badge1_subtitle || fetchedSettings.heroBadge1Subtitle || DEFAULT_UI_SETTINGS.heroBadge1Subtitle,
             heroBadge2Title: fetchedSettings.hero_badge2_title || fetchedSettings.heroBadge2Title || DEFAULT_UI_SETTINGS.heroBadge2Title,
             heroBadge2Subtitle: fetchedSettings.hero_badge2_subtitle || fetchedSettings.heroBadge2Subtitle || DEFAULT_UI_SETTINGS.heroBadge2Subtitle,
-            heroBadge3Title: fetchedSettings.hero_badge3_title || fetchedSettings.heroBadge3Title || DEFAULT_UI_SETTINGS.heroBadge3Title,
             heroBadge3Title: fetchedSettings.hero_badge3_title || fetchedSettings.heroBadge3Title || DEFAULT_UI_SETTINGS.heroBadge3Title,
             heroBadge3Subtitle: fetchedSettings.hero_badge3_subtitle || fetchedSettings.heroBadge3Subtitle || DEFAULT_UI_SETTINGS.heroBadge3Subtitle,
             ogImageUrl: fetchedSettings.og_image_url || fetchedSettings.ogImageUrl || DEFAULT_UI_SETTINGS.ogImageUrl,
@@ -320,8 +318,6 @@ function App() {
         hero_badge2_title: newSettings.heroBadge2Title,
         hero_badge2_subtitle: newSettings.heroBadge2Subtitle,
         hero_badge3_title: newSettings.heroBadge3Title,
-        hero_badge2_subtitle: newSettings.heroBadge2Subtitle,
-        hero_badge3_title: newSettings.heroBadge3Title,
         hero_badge3_subtitle: newSettings.heroBadge3Subtitle,
         og_image_url: newSettings.ogImageUrl
       };
@@ -332,9 +328,8 @@ function App() {
   };
 
   const handleAddItemToCart = (item) => {
-    setCartItems(prev => [...prev, item]);
-    // Optional: Navigate to checkout or show success message
-    if (confirm(`Added ${item.name} to checkout. Go to checkout now?`)) {
+    if (confirm(`Add ${item.name} to your scope?`)) {
+      setCartItems(prev => [...prev, item]);
       navigate('/');
     }
   };

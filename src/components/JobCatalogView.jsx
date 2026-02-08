@@ -60,6 +60,11 @@ const JobCatalogView = ({
         }
     };
 
+    const handleClickAdd = (item, isBundle = false) => {
+        const newItem = { ...item, uniqueId: Date.now() + Math.random(), ...(isBundle && { isBundle: true }) };
+        onAddItem(newItem);
+    };
+
     return (
         <div className="flex flex-col lg:flex-row gap-8 relative flex-1">
             {/* Left Column: Service Selector */}
@@ -88,7 +93,7 @@ const JobCatalogView = ({
 
                     <div className="mb-6 flex items-center gap-2 text-textMuted text-sm">
                         <IconDrag />
-                        <span>Drag items to the right to build your stack</span>
+                        <span>Drag or click + to add items to your scope</span>
                     </div>
 
                     {checkoutTab === 'bundles' ? (
@@ -100,6 +105,7 @@ const JobCatalogView = ({
                                         bundle={bundle}
                                         services={services}
                                         onDragStart={handleDragStart}
+                                        onClickAdd={handleClickAdd}
                                     />
                                 ))
                             ) : (
@@ -120,7 +126,7 @@ const JobCatalogView = ({
                                         key={service.id}
                                         service={service}
                                         onDragStart={handleDragStart}
-                                    // onViewDetails removed as ServiceCard will use Link
+                                        onClickAdd={handleClickAdd}
                                     />
                                 ))
                             )}
@@ -151,7 +157,7 @@ const JobCatalogView = ({
                         {cartItems.length === 0 ? (
                             <div className="h-full flex flex-col items-center justify-center text-gray-500 border-2 border-dashed border-slate-800 rounded-xl p-10">
                                 <IconDrag />
-                                <p className="mt-4 text-sm font-medium">Drag jobs here to build your scope</p>
+                                <p className="mt-4 text-sm font-medium">Drag or click + to add jobs to your scope</p>
                             </div>
                         ) : (
                             <div className="space-y-3">
